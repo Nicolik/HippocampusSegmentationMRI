@@ -160,8 +160,7 @@ class VXNet3D(nn.Module):
         self.up_block_1   = UpConvBlock2b(out_channels=channels * 4, undersampling_factor=4)
         self.cat_block_1  = CatBlock()
 
-        self.out_conv     = FinalConv(num_outs=num_outs)
-
+        self.out_conv     = FinalConv(num_outs=num_outs, out_channels=channels * 2)
 
     def forward(self, x):
 

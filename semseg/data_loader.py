@@ -60,7 +60,7 @@ class Dataset3DFull(torch.utils.data.Dataset):
         return (inputs, labels)
 
     def normalize(self, inputs):
-        return inputs
+        return min_max_normalization(inputs)
 
     def perform_zero_pad(self, inputs, labels):
         inputs_padded = np.zeros(self.pad_ref)
@@ -69,3 +69,19 @@ class Dataset3DFull(torch.utils.data.Dataset):
         inputs_padded[:inputs.shape[0], :inputs.shape[1], :inputs.shape[2]] = inputs
         labels_padded[:labels.shape[0], :labels.shape[1], :labels.shape[2]] = labels
         return (inputs_padded, labels_padded)
+
+
+def GetDataLoader3D(config: SemSegConfig) -> torch.utils.data.DataLoader:
+    print('Building Training Set Loader...')
+    train = Dataset3DFull(config.train_images, config.train_labels,
+                          augmentation=config.augmentation, do_normalize=config.do_normalize,
+                          zero_pad=config.zero_pad, pad_ref=config.pad_ref)
+
+    train_data = torch.utils.data.DataLoader(train, batch_size=config.batch_size, shuffle=True,
+                                             num_workers=config.num_workers)
+    print('Training Loader built!')
+    return train_data
+
+
+def min_max_normalization(input):
+    return (input - input.min()) / (input.max() - input.min())

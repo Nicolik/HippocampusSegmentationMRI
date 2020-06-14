@@ -15,7 +15,8 @@ import torch.optim as optim
 # Local Imports
 ##########################
 from config import *
-from semseg.utils import GetDataLoader3D, train_model
+from semseg.utils import train_model
+from semseg.data_loader import GetDataLoader3D
 from models.vnet3d import VXNet3D
 
 ##########################
@@ -48,7 +49,7 @@ iterable_data_loader = iter(train_data_loader_3D)
 inputs,labels = next(iterable_data_loader)
 print("Shape of Batch: [input {}] [label {}]".format(inputs.shape, labels.shape))
 
-net = VXNet3D(num_outs=3)
+net = VXNet3D(num_outs=config.num_outs, channels=8)
 outputs = net(inputs)
 print("Shape of Output: [output {}]".format(outputs.shape))
 
@@ -62,3 +63,5 @@ net = net.to(cuda_dev)
 
 net = train_model(net, optimizer, train_data_loader_3D,
                   config, device=cuda_dev, logs_folder=logs_folder)
+
+torch.save(net,os.path.join(logs_folder,"model.pt"))

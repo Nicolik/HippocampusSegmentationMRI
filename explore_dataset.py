@@ -2,11 +2,12 @@ import os
 import numpy as np
 import SimpleITK as sitk
 from config import *
-from semseg.utils import min_max_normalization
+from semseg.data_loader import min_max_normalization
 
 sizes_list = list()
 min_list = list()
 max_list = list()
+mean_list = list()
 
 for idx, train_image in enumerate(train_images):
     print("Iter {} on {}".format(idx+1, len(train_images)))
@@ -24,21 +25,26 @@ for idx, train_image in enumerate(train_images):
     print("Sizes = {}".format(sizes))
     min_val = t1.min()
     max_val = t1.max()
+    mean_val = t1.sum() / t1.size
     print("[Before Normalization]")
-    print("Min = {:.1f} Max = {:.1f}".format(min_val, max_val))
+    print("Min = {:.1f} Max = {:.1f} Mean = {:.1f}".format(min_val, max_val, mean_val))
     min_list.append(min_val)
     max_list.append(max_val)
+    mean_list.append(mean_val)
 
     t1_norm = min_max_normalization(t1)
     min_val_norm = t1_norm.min()
     max_val_norm = t1_norm.max()
+    mean_val_norm = t1_norm.sum() / t1_norm.size
     print("[After  Normalization]")
-    print("Min = {:.1f} Max = {:.1f}".format(min_val_norm, max_val_norm))
+    print("Min = {:.1f} Max = {:.1f} Mean = {:.1f}".format(min_val_norm, max_val_norm, mean_val_norm))
 
 print("Min belongs to range {:.1f} - {:.1f}. Mean: {:.1f}".
       format(min(min_list),max(min_list),sum(min_list)/len(min_list)))
 print("Max belongs to range {:.1f} - {:.1f}. Mean: {:.1f}".
       format(min(max_list),max(max_list),sum(max_list)/len(max_list)))
+print("Mean belongs to range {:.1f} - {:.1f}. Mean: {:.1f}".
+      format(min(mean_list),max(mean_list),sum(mean_list)/len(mean_list)))
 
 z_list, y_list, x_list = list(), list(), list()
 for size in sizes_list:

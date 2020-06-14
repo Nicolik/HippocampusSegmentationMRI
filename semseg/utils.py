@@ -2,24 +2,7 @@ import torch
 import os
 import time
 import numpy as mp
-from semseg.data_loader import SemSegConfig, Dataset3DFull
 from semseg.loss import get_multi_dice_loss, LEARNING_RATE_REDUCTION_FACTOR
-
-def GetDataLoader3D(config: SemSegConfig) -> torch.utils.data.DataLoader:
-    print('Building Training Set Loader...')
-    train = Dataset3DFull(config.train_images, config.train_labels,
-                          augmentation=config.augmentation, do_normalize=config.do_normalize,
-                          zero_pad=config.zero_pad, pad_ref=config.pad_ref)
-
-    train_data = torch.utils.data.DataLoader(train, batch_size=config.batch_size, shuffle=True,
-                                             num_workers=config.num_workers)
-    print('Training Loader built!')
-    return train_data
-
-
-def min_max_normalization(input):
-    return (input - input.min()) / (input.max() - input.min())
-
 
 def train_model(net, optimizer, train_data, config,
                 device=None, logs_folder=None):
@@ -66,7 +49,6 @@ def train_model(net, optimizer, train_data, config,
         # print statistics
         print('  [Epoch {:04d}] - Train dice loss: {:.4f} - Time: {:.1f}'
               .format(epoch + 1, running_loss / (i + 1), epoch_elapsed_time))
-
 
         # switch to eval mode
         net.eval()
