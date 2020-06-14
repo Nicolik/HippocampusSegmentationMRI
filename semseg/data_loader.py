@@ -58,17 +58,20 @@ class Dataset3DFull(torch.utils.data.Dataset):
 
     def perform_augmentation(self, inputs, labels):
         return (inputs, labels)
+        #TODO: implement some augmentation technique
 
     def normalize(self, inputs):
         return min_max_normalization(inputs)
 
     def perform_zero_pad(self, inputs, labels):
-        inputs_padded = np.zeros(self.pad_ref)
-        labels_padded = np.zeros(self.pad_ref)
+        return (zero_pad_3d_image(inputs, self.pad_ref),
+                zero_pad_3d_image(labels, self.pad_ref))
 
-        inputs_padded[:inputs.shape[0], :inputs.shape[1], :inputs.shape[2]] = inputs
-        labels_padded[:labels.shape[0], :labels.shape[1], :labels.shape[2]] = labels
-        return (inputs_padded, labels_padded)
+
+def zero_pad_3d_image(image, pad_ref=(64,64,64)):
+    image_padded = np.zeros(pad_ref)
+    image_padded[:image.shape[0],:image.shape[1],:image.shape[2]] = image
+    return image_padded
 
 
 def GetDataLoader3D(config: SemSegConfig) -> torch.utils.data.DataLoader:
