@@ -3,10 +3,10 @@ from semseg.data_loader import SemSegConfig
 
 logs_folder = "logs"
 
-train_images_folder = "H:\Datasets\Task04_Hippocampus\imagesTr"
-train_labels_folder = "H:\Datasets\Task04_Hippocampus\labelsTr"
+train_images_folder = "datasets/Task04_Hippocampus/imagesTr"
+train_labels_folder = "datasets/Task04_Hippocampus/labelsTr"
 
-train_prediction_folder = "H:\Datasets\Task04_Hippocampus\predTr"
+train_prediction_folder = "datasets/Task04_Hippocampus/predTr"
 os.makedirs(train_prediction_folder, exist_ok=True)
 
 train_images = os.listdir(train_images_folder)
@@ -14,10 +14,10 @@ train_labels = os.listdir(train_labels_folder)
 
 train_images = [train_image for train_image in train_images
                 if train_image.endswith(".nii.gz")]
-train_labels = [train_image for train_image in train_images
-                if train_image.endswith(".nii.gz")]
+train_labels = [train_label for train_label in train_labels
+                if train_label.endswith(".nii.gz")]
 
-test_images_folder = "H:\Datasets\Task04_Hippocampus\imagesTs"
+test_images_folder = "datasets/Task04_Hippocampus/imagesTs"
 
 test_images = os.listdir(test_images_folder)
 
@@ -27,9 +27,11 @@ class SemSegMRIConfig(SemSegConfig):
                     for train_image in train_images]
     train_labels = [os.path.join(train_labels_folder, train_label)
                     for train_label in train_labels]
+    val_images = None
+    val_labels = None
     do_normalize = True
     augmentation = None
-    batch_size = 1
+    batch_size = 4
     num_workers = 0
     pad_ref = (48, 64, 48)
     lr = 0.01
@@ -38,3 +40,5 @@ class SemSegMRIConfig(SemSegConfig):
     val_epochs = epochs // 5
     cuda = True
     num_outs = 3
+    do_crossval = True
+    num_folders = 5

@@ -139,11 +139,11 @@ class CatBlock(nn.Module):
         return cat
 
 
-class VXNet3D(nn.Module):
+class VNet3D(nn.Module):
 
     def __init__(self, num_outs=2, channels=16):
 
-        super(VXNet3D, self).__init__()
+        super(VNet3D, self).__init__()
 
         self.init_conv  = InitialConv(out_channels=channels)
 

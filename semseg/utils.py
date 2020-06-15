@@ -25,11 +25,10 @@ def train_model(net, optimizer, train_data, config,
 
         for i, data in enumerate(train_data):
 
-            # wrap data in Variables
             inputs, labels = data
             if config.cuda: inputs, labels = inputs.cuda(), labels.cuda()
 
-            # forward pass and loss calculation
+            # forward pass
             outputs = net(inputs)
 
             # get multi dice loss
@@ -62,6 +61,35 @@ def train_model(net, optimizer, train_data, config,
     print('Training ended!')
     return net
 
+
+def val_model(net, val_data, config,
+              device=None):
+
+    print("Start Validation...")
+    # val loop
+    multi_dices = list()
+    with torch.no_grad():
+        net.eval()
+        for i, data in enumerate(val_data):
+
+            inputs, labels = data
+            if config.cuda: inputs, labels = inputs.cuda(), labels.cuda()
+
+            # forward pass
+            outputs = net(inputs)
+            outputs = torch.argmax(outputs, dim=1)  # 1 x Z x Y x X
+            outputs_np = outputs.data.cpu().numpy() # 1 x Z x Y x X
+            outputs_np = outputs_np[0]              #     Z x Y x X
+            labels_np = labels.data.cpu().numpy()   # 1 x Z x Y x X
+            labels_np = labels_np[0]                #     Z x Y x X
+
+            multi_dice = multi_dice_coeff(labels_np,outputs_np,config.num_outs)
+            multi_dices.append(multi_dice)
+    multi_dices_np = np.array(multi_dices)
+    mean_multi_dice = np.mean(multi_dices_np)
+    std_multi_dice = np.std(multi_dices_np)
+    print("Multi-Dice: {:.4f +/- :.4f}".format(mean_multi_dice,std_multi_dice))
+    return multi_dices, mean_multi_dice, std_multi_dice
 
 def dice_coeff(gt, pred, eps=1e-5):
     dice = np.sum(pred[gt == 1]) * 2.0 / (np.sum(pred) + np.sum(gt))

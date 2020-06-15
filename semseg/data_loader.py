@@ -6,6 +6,8 @@ import numpy as np
 class SemSegConfig():
     train_images = None
     train_labels = None
+    val_images   = None
+    val_labels   = None
     do_normalize = True
     augmentation = None
     zero_pad     = True
@@ -81,7 +83,7 @@ def zero_pad_3d_image(image, pad_ref=(64,64,64), value_to_pad = 0):
     return image_padded
 
 
-def GetDataLoader3D(config: SemSegConfig) -> torch.utils.data.DataLoader:
+def GetDataLoader3DTraining(config: SemSegConfig) -> torch.utils.data.DataLoader:
     print('Building Training Set Loader...')
     train = Dataset3DFull(config.train_images, config.train_labels,
                           augmentation=config.augmentation, do_normalize=config.do_normalize,
@@ -91,6 +93,18 @@ def GetDataLoader3D(config: SemSegConfig) -> torch.utils.data.DataLoader:
                                              num_workers=config.num_workers)
     print('Training Loader built!')
     return train_data
+
+
+def GenDataLoader3DValidation(config: SemSegConfig) -> torch.utils.data.DataLoader:
+    print('Building Validation Set Loader...')
+    val_dataset = Dataset3DFull(config.val_images, config.val_labels,
+                                augmentation=None, do_normalize=config.do_normalize,
+                                zero_pad=config.zero_pad, pad_ref=config.pad_ref)
+
+    val_dataloader = torch.utils.data.DataLoader(val_dataset, batch_size=config.batch_size,
+                                                 shuffle=False, num_workers=config.num_workers)
+    print('Validation Loader built!')
+    return val_dataloader
 
 
 def min_max_normalization(input):

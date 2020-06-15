@@ -17,7 +17,7 @@ import SimpleITK as sitk
 from config import *
 from semseg.data_loader import min_max_normalization, zero_pad_3d_image, z_score_normalization
 from semseg.utils import multi_dice_coeff
-from models.vnet3d import VXNet3D
+from models.vnet3d import VNet3D
 
 ##########################
 # Config
@@ -39,7 +39,7 @@ if use_final_model:
     net = torch.load(path_net)
 else:
     path_net = "logs/model_epoch_0016.pht"
-    net = VXNet3D(num_outs=config.num_outs, channels=8)
+    net = VNet3D(num_outs=config.num_outs, channels=8)
     net.load_state_dict(torch.load(path_net))
 net = net.cuda(cuda_dev)
 net.eval()
@@ -84,7 +84,7 @@ for idx, (train_image, train_label) in enumerate(zip(train_images, train_labels)
         outputs = torch.argmax(outputs, dim=1) # 1 x Z x Y x X
         outputs_np = outputs.data.cpu().numpy()
 
-    outputs_np = outputs_np[0]
+    outputs_np = outputs_np[0] # Z x Y x X
     outputs_np = outputs_np[:train_image_np.shape[0],
                             :train_image_np.shape[1],
                             :train_image_np.shape[2]]
@@ -105,5 +105,5 @@ multi_dices_np = np.array(multi_dices)
 mean_multi_dice = np.mean(multi_dices_np)
 std_multi_dice  = np.std(multi_dices_np,ddof=1)
 
-print("Multi Class Dice       ===> {:.4f}+/-{:.4f}".format(mean_multi_dice, std_multi_dice))
+print("Multi Class Dice       ===> {:.4f} +/- {:.4f}".format(mean_multi_dice, std_multi_dice))
 print("Images with Dice > 0.8 ===> {} on {}".format((multi_dices_np>0.8).sum(),multi_dices_np.size))
