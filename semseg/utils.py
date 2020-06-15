@@ -77,11 +77,11 @@ def val_model(net, val_data, config,
 
             # forward pass
             outputs = net(inputs)
-            outputs = torch.argmax(outputs, dim=1)  # 1 x Z x Y x X
-            outputs_np = outputs.data.cpu().numpy() # 1 x Z x Y x X
-            outputs_np = outputs_np[0]              #     Z x Y x X
-            labels_np = labels.data.cpu().numpy()   # 1 x Z x Y x X
-            labels_np = labels_np[0]                #     Z x Y x X
+            outputs = torch.argmax(outputs, dim=1)  # B x 1 x Z x Y x X
+            outputs_np = outputs.data.cpu().numpy() # B x 1 x Z x Y x X
+            outputs_np = outputs_np[:,0]            #     B x Z x Y x X
+            labels_np = labels.data.cpu().numpy()   # B x 1 x Z x Y x X
+            labels_np = labels_np[:,0]              #     B x Z x Y x X
 
             multi_dice = multi_dice_coeff(labels_np,outputs_np,config.num_outs)
             multi_dices.append(multi_dice)
@@ -109,17 +109,18 @@ def multi_dice_coeff(gt, pred, num_classes):
 
 
 def one_hot_encode_np(label, num_classes):
-    """
-
-    :param label: Numpy Array of shape HxW or DxHxW
+    """ Numpy One Hot Encode
+    :param label: Numpy Array of shape BxHxW or BxDxHxW
     :param num_classes: K classes
-    :return: label_ohe, Numpy Array of shape KxHxW or KxDxHxW
+    :return: label_ohe, Numpy Array of shape BxKxHxW or BxKxDxHxW
     """
-    assert len(label.shape) == 2 or len(label.shape) == 3, 'Invalid Label Shape {}'.format(label.shape)
-    if len(label.shape) == 2:
-        label_ohe = np.zeros((num_classes, label.shape[0], label.shape[1]))
-    elif len(label.shape) == 3:
-        label_ohe = np.zeros(( num_classes, label.shape[0], label.shape[1], label.shape[2]))
-    for cls in range(num_classes):
-        label_ohe[cls] = (label == cls)
+    assert len(label.shape) == 3 or len(label.shape) == 4, 'Invalid Label Shape {}'.format(label.shape)
+    label_ohe = None
+    if len(label.shape) == 3:
+        label_ohe = np.zeros((label.shape[0], num_classes, label.shape[1], label.shape[2]))
+    elif len(label.shape) == 4:
+        label_ohe = np.zeros((label.shape[0], num_classes, label.shape[1], label.shape[2], label.shape[3]))
+    for batch_idx, batch_el_label in enumerate(label):
+        for cls in range(num_classes):
+            label_ohe[batch_idx, cls] = (batch_el_label == cls)
     return label_ohe

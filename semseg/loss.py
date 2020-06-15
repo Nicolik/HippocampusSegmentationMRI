@@ -13,13 +13,13 @@ def dice(outputs, labels):
 
 
 def one_hot_encode(label, num_classes):
-    """
-
+    """ Torch One Hot Encode
     :param label: Tensor of shape BxHxW or BxDxHxW
     :param num_classes: K classes
     :return: label_ohe, Tensor of shape BxKxHxW or BxKxDxHxW
     """
     assert len(label.shape) == 3 or len(label.shape) == 4, 'Invalid Label Shape {}'.format(label.shape)
+    label_ohe = None
     if len(label.shape) == 3:
         label_ohe = torch.zeros((label.shape[0], num_classes, label.shape[1], label.shape[2]))
     elif len(label.shape) == 4:

@@ -97,7 +97,9 @@ for idx, (train_image, train_label) in enumerate(zip(train_images, train_labels)
     filename_out = os.path.join(train_prediction_folder, train_image)
     sitk.WriteImage(outputs_sitk, filename_out)
 
-    multi_dice = multi_dice_coeff(train_label_np, outputs_np, config.num_outs)
+    multi_dice = multi_dice_coeff(np.expand_dims(train_label_np,axis=0),
+                                  np.expand_dims(outputs_np,axis=0),
+                                  config.num_outs)
     print("Multi Class Dice Coeff = {:.4f}".format(multi_dice))
     multi_dices.append(multi_dice)
 
