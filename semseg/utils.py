@@ -71,15 +71,15 @@ def val_model(net, val_data, config,
     with torch.no_grad():
         net.eval()
         for i, data in enumerate(val_data):
+            print("Iter {} on {}".format(i+1,len(val_data)))
 
             inputs, labels = data
             if config.cuda: inputs, labels = inputs.cuda(), labels.cuda()
 
             # forward pass
             outputs = net(inputs)
-            outputs = torch.argmax(outputs, dim=1)  # B x 1 x Z x Y x X
-            outputs_np = outputs.data.cpu().numpy() # B x 1 x Z x Y x X
-            outputs_np = outputs_np[:,0]            #     B x Z x Y x X
+            outputs = torch.argmax(outputs, dim=1)  #     B x Z x Y x X
+            outputs_np = outputs.data.cpu().numpy() #     B x Z x Y x X
             labels_np = labels.data.cpu().numpy()   # B x 1 x Z x Y x X
             labels_np = labels_np[:,0]              #     B x Z x Y x X
 
@@ -88,7 +88,7 @@ def val_model(net, val_data, config,
     multi_dices_np = np.array(multi_dices)
     mean_multi_dice = np.mean(multi_dices_np)
     std_multi_dice = np.std(multi_dices_np)
-    print("Multi-Dice: {:.4f +/- :.4f}".format(mean_multi_dice,std_multi_dice))
+    print("Multi-Dice: {:.4f} +/- {:.4f}".format(mean_multi_dice,std_multi_dice))
     return multi_dices, mean_multi_dice, std_multi_dice
 
 def dice_coeff(gt, pred, eps=1e-5):
@@ -101,8 +101,8 @@ def multi_dice_coeff(gt, pred, num_classes):
     outputs = one_hot_encode_np(pred, num_classes)
     dices = list()
     for cls in range(1, num_classes):
-        outputs_ = outputs[cls]
-        labels_  = labels[cls]
+        outputs_ = outputs[:, cls]
+        labels_  = labels[:, cls]
         dice_ = dice_coeff(outputs_, labels_)
         dices.append(dice_)
     return sum(dices) / (num_classes-1)
