@@ -95,6 +95,7 @@ if config.do_crossval:
         ##########################
         # Training (cross-validation)
         ##########################
+        net = VNet3D(num_outs=config.num_outs, channels=8)
         train_data_loader_3D = GetDataLoader3DTraining(config)
         net = train_model(net, optimizer, train_data_loader_3D,
                           config, device=cuda_dev, logs_folder=logs_folder)
