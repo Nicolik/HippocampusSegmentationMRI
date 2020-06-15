@@ -31,8 +31,9 @@ class SemSegMRIConfig(SemSegConfig):
     augmentation = None
     batch_size = 1
     num_workers = 0
+    pad_ref = (48, 64, 48)
     lr = 0.01
-    epochs = 20
+    epochs = 100
     low_lr_epoch = epochs // 5
     val_epochs = epochs // 5
     cuda = True

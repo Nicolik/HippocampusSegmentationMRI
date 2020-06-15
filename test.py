@@ -15,7 +15,7 @@ import SimpleITK as sitk
 # Local Imports
 ##########################
 from config import *
-from semseg.data_loader import min_max_normalization, zero_pad_3d_image
+from semseg.data_loader import min_max_normalization, zero_pad_3d_image, z_score_normalization
 from semseg.utils import multi_dice_coeff
 from models.vnet3d import VXNet3D
 
@@ -47,7 +47,7 @@ net.eval()
 ###########################
 # Eval Loop
 ###########################
-pad_ref = (64,64,64)
+pad_ref = (48,64,48)
 multi_dices = list()
 
 for idx, (train_image, train_label) in enumerate(zip(train_images, train_labels)):
@@ -68,9 +68,12 @@ for idx, (train_image, train_label) in enumerate(zip(train_images, train_labels)
     print("Spacing       {}".format(spacing))
     print("Direction     {}".format(direction))
 
-    train_image_np = min_max_normalization(train_image_np)
+    # train_image_np = min_max_normalization(train_image_np)
+    train_image_np = z_score_normalization(train_image_np)
 
-    inputs_padded = zero_pad_3d_image(train_image_np, pad_ref) #         Z x Y x X
+    inputs_padded = zero_pad_3d_image(train_image_np, pad_ref,
+                                      value_to_pad=train_image_np.min())
+                                                               #         Z x Y x X
     inputs_padded = np.expand_dims(inputs_padded,axis=0)       #     1 x Z x Y x X
     inputs_padded = np.expand_dims(inputs_padded,axis=0)       # 1 x 1 x Z x Y x X
 

@@ -43,13 +43,17 @@ class Dataset3DFull(torch.utils.data.Dataset):
         inputs, labels = image_np, label_np
         # DEBUG ONLY
         # print("Shapes: [image {}] [label {}]".format(inputs.shape, labels.shape))
+        # print("Range - Before Normalization - [{:.1f} {:.1f}]".format(inputs.min(),inputs.max()))
 
         if self.do_normalize:
             inputs = self.normalize(inputs)
+            # print("Range - After  Normalization - [{:.1f} {:.1f}]".format(inputs.min(), inputs.max()))
         if self.augmentation is not None:
             inputs, labels = self.perform_augmentation(inputs, labels)
+            # print("Range - After  Augmentation  - [{:.1f} {:.1f}]".format(inputs.min(), inputs.max()))
         if self.zero_pad:
-            inputs, labels = self.perform_zero_pad(inputs, labels)
+            inputs, labels = self.perform_zero_pad(inputs, labels, value_to_pad=inputs.min())
+            # print("Range - After  Padding       - [{:.1f} {:.1f}]".format(inputs.min(), inputs.max()))
 
         inputs,labels = np.expand_dims(inputs,axis=0), np.expand_dims(labels,axis=0)
 
@@ -57,19 +61,22 @@ class Dataset3DFull(torch.utils.data.Dataset):
         return (features, targets)
 
     def perform_augmentation(self, inputs, labels):
+        # TODO: implement some augmentation technique
         return (inputs, labels)
-        #TODO: implement some augmentation technique
 
     def normalize(self, inputs):
-        return min_max_normalization(inputs)
+        return z_score_normalization(inputs)
 
-    def perform_zero_pad(self, inputs, labels):
-        return (zero_pad_3d_image(inputs, self.pad_ref),
-                zero_pad_3d_image(labels, self.pad_ref))
+    def perform_zero_pad(self, inputs, labels, value_to_pad = 0):
+        return (zero_pad_3d_image(inputs, self.pad_ref, value_to_pad),
+                zero_pad_3d_image(labels, self.pad_ref, 0))
 
 
-def zero_pad_3d_image(image, pad_ref=(64,64,64)):
-    image_padded = np.zeros(pad_ref)
+def zero_pad_3d_image(image, pad_ref=(64,64,64), value_to_pad = 0):
+    if value_to_pad == 0:
+        image_padded = np.zeros(pad_ref)
+    else:
+        image_padded = value_to_pad * np.ones(pad_ref)
     image_padded[:image.shape[0],:image.shape[1],:image.shape[2]] = image
     return image_padded
 
@@ -88,3 +95,10 @@ def GetDataLoader3D(config: SemSegConfig) -> torch.utils.data.DataLoader:
 
 def min_max_normalization(input):
     return (input - input.min()) / (input.max() - input.min())
+
+
+def z_score_normalization(input):
+    input_mean = np.mean(input)
+    input_std = np.std(input)
+    # print("Mean = {:.2f} - Std = {:.2f}".format(input_mean,input_std))
+    return (input - input_mean)/input_std
