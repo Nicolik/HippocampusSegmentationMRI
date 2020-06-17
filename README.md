@@ -36,14 +36,23 @@ If you want to perform the inference, either on the training set images, or the
 test set images, see the test.py file.
 
 ### Sample Images (Training set)
-#### Ground Truth Images 
-![Ground Truth - MRI 327 (1)](images/327_gt_01.png)
-![Ground Truth - MRI 327 (2)](images/327_gt_02.png)
-#### Predicted Images 
+#### Ground Truth Images
+Ground Truth - MRI 327 (1)
+![Ground Truth - MRI 327 (1)](images/327_gt_01.png){:height="36px" width="36px"}
+
+Ground Truth - MRI 327 (2)
+![Ground Truth - MRI 327 (2)](images/327_gt_02.png){:height="36px" width="36px"}
+#### Predicted Images
+Prediction   - MRI 327 (1)
 ![Prediction   - MRI 327 (1)](images/327_pred_01.png)
+
+Prediction   - MRI 327 (2)
 ![Prediction   - MRI 327 (2)](images/327_pred_02.png)
  
 ### Sample Images (Test set)
 #### Predicted Images
+Prediction   - MRI 283 (1)
 ![Prediction   - MRI 283 (1)](images/283_pred_01.png)
+
+Prediction   - MRI 283 (2)
 ![Prediction   - MRI 283 (2)](images/283_pred_02.png)
