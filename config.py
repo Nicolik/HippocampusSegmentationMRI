@@ -42,3 +42,4 @@ class SemSegMRIConfig(SemSegConfig):
     num_outs = 3
     do_crossval = True
     num_folders = 5
+    num_channels = 8

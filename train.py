@@ -54,7 +54,7 @@ print("Shape of Batch: [input {}] [label {}]".format(inputs.shape, labels.shape)
 ##########################
 # Check Net
 ##########################
-net = VNet3D(num_outs=config.num_outs, channels=8)
+net = VNet3D(num_outs=config.num_outs, channels=config.num_channels)
 outputs = net(inputs)
 print("Shape of Output: [output {}]".format(outputs.shape))
 
@@ -95,7 +95,7 @@ if config.do_crossval:
         ##########################
         # Training (cross-validation)
         ##########################
-        net = VNet3D(num_outs=config.num_outs, channels=8)
+        net = VNet3D(num_outs=config.num_outs, channels=config.num_channels)
         train_data_loader_3D = GetDataLoader3DTraining(config)
         net = train_model(net, optimizer, train_data_loader_3D,
                           config, device=cuda_dev, logs_folder=logs_folder)
@@ -119,6 +119,7 @@ config.train_images = [os.path.join(train_images_folder, train_image)
                        for train_image in train_images]
 config.train_labels = [os.path.join(train_labels_folder, train_label)
                        for train_label in train_labels]
+net = VNet3D(num_outs=config.num_outs, channels=config.num_channels)
 train_data_loader_3D = GetDataLoader3DTraining(config)
 net = train_model(net, optimizer, train_data_loader_3D,
                   config, device=cuda_dev, logs_folder=logs_folder)
