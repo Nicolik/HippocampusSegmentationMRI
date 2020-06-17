@@ -63,7 +63,6 @@ print("Shape of Output: [output {}]".format(outputs.shape))
 ##########################
 cuda_dev = torch.device('cuda')
 optimizer = optim.Adam(net.parameters(), lr=config.lr)
-
 net = net.to(cuda_dev)
 
 if config.do_crossval:

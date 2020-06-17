@@ -8,6 +8,7 @@ def train_model(net, optimizer, train_data, config,
                 device=None, logs_folder=None):
 
     print('Start training...')
+    net = net.to(device)
     # train loop
     for epoch in range(config.epochs):
 
