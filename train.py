@@ -110,6 +110,14 @@ if config.do_crossval:
         std_multi_dice_crossval.append(std_multi_dice)
         torch.save(net, os.path.join(logs_folder, "model_folder_{:d}.pt".format(idx)))
 
+    ##########################
+    # Saving Validation Results
+    ##########################
+    multi_dices_crossval_flatten = [item for sublist in multi_dices_crossval for item in sublist]
+    mean_multi_dice_crossval_flatten = np.mean(multi_dices_crossval_flatten)
+    std_multi_dice_crossval_flatten = np.std(multi_dices_crossval_flatten)
+    print("Multi-Dice: {:.4f} +/- {:.4f}".format(mean_multi_dice_crossval_flatten, std_multi_dice_crossval_flatten))
+    # Multi-Dice: 0.8789 +/- 0.0211
 
 ##########################
 # Training (full training set)
