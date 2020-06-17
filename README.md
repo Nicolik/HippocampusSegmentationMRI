@@ -37,22 +37,35 @@ test set images, see the test.py file.
 
 ### Sample Images (Training set)
 #### Ground Truth Images
-Ground Truth - MRI 327 (1)
-![Ground Truth - MRI 327 (1)](images/327_gt_01.png)
-<img src="images/327_gt_01.png" alt="Ground Truth - MRI 327 (1)" width="250"/>
-Ground Truth - MRI 327 (2)
-![Ground Truth - MRI 327 (2)](images/327_gt_02.png)
-#### Predicted Images
-Prediction   - MRI 327 (1)
-![Prediction   - MRI 327 (1)](images/327_pred_01.png)
+<table>
+<th>
+<td>Ground Truth - MRI 327 (1)</td>
+<td>Ground Truth - MRI 327 (2)</td>
+</th>
+<tr>
+<td><img src="images/327_gt_01.png" alt="Ground Truth - MRI 327 (1)" width="250"/></td>
+<td><img src="images/327_gt_02.png" alt="Ground Truth - MRI 327 (2)" width="250"/></td>
+</tr>
 
-Prediction   - MRI 327 (2)
-![Prediction   - MRI 327 (2)](images/327_pred_02.png)
- 
+#### Predicted Images
+<table>
+<th>
+<td>Prediction   - MRI 327 (1)</td>
+<td>Prediction   - MRI 327 (2)</td>
+</th>
+<tr>
+<td><img src="images/327_pred_01.png" alt="Prediction   - MRI 327 (1)" width="250"/></td>
+<td><img src="images/327_pred_02.png" alt="Prediction   - MRI 327 (2)" width="250"/></td>
+</tr>
+
 ### Sample Images (Test set)
 #### Predicted Images
-Prediction   - MRI 283 (1)
-![Prediction   - MRI 283 (1)](images/283_pred_01.png)
-
-Prediction   - MRI 283 (2)
-![Prediction   - MRI 283 (2)](images/283_pred_02.png)
+<table>
+<th>
+<td>Prediction   - MRI 283 (1)</td>
+<td>Prediction   - MRI 283 (2)</td>
+</th>
+<tr>
+<td><img src="images/283_pred_01.png" alt="Prediction   - MRI 283 (1)" width="250"/></td>
+<td><img src="images/283_pred_02.png" alt="Prediction   - MRI 283 (2)" width="250"/></td>
+</tr>
