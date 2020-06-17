@@ -31,7 +31,7 @@ class SemSegMRIConfig(SemSegConfig):
     val_labels = None
     do_normalize = True
     augmentation = None
-    batch_size = 6
+    batch_size = 4
     num_workers = 0
     pad_ref = (48, 64, 48)
     lr = 0.01
