@@ -37,13 +37,13 @@ test set images, see the test.py file.
 
 ### Sample Images (Training set)
 #### Ground Truth Images 
-![Ground Truth - MRI 327 (1)]("images/327_gt_01.png")
-![Ground Truth - MRI 327 (2)](“images/327_gt_02.png”)
+![Ground Truth - MRI 327 (1)](images/327_gt_01.png)
+![Ground Truth - MRI 327 (2)](images/327_gt_02.png)
 #### Predicted Images 
-![Prediction   - MRI 327 (1)]("images/327_pred_01.png")
-![Prediction   - MRI 327 (2)](“images/327_pred_02.png”)
+![Prediction   - MRI 327 (1)](images/327_pred_01.png)
+![Prediction   - MRI 327 (2)](images/327_pred_02.png)
  
 ### Sample Images (Test set)
 #### Predicted Images
-![Prediction   - MRI 283 (1)]("images/283_pred_01.png")
-![Prediction   - MRI 283 (2)](“images/283_pred_02.png")
+![Prediction   - MRI 283 (1)](images/283_pred_01.png)
+![Prediction   - MRI 283 (2)](images/283_pred_02.png)
