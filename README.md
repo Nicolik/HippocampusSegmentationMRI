@@ -27,13 +27,13 @@ Meshes and images reported in the ```images``` folder have been obtained exploit
 - [ ] Command Line Interface for training and testing 
 
 ## Training
-If you simply want to perform the training, run the train.py file.
-If you want to edit the configuration, modify the config.py file.
+If you simply want to perform the training, run the ```train.py``` file.
+If you want to edit the configuration, modify the ```config.py``` file.
 In particular, consider the class ```SemSegMRIConfig```.
 
 ## Testing
 If you want to perform the inference, either on the training set images, or the
-test set images, see the test.py file.
+test set images, see the ```test.py``` file.
 
 ### Sample Images (Training set)
 #### Ground Truth Images
