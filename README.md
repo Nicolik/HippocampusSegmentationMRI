@@ -38,10 +38,10 @@ test set images, see the test.py file.
 ### Sample Images (Training set)
 #### Ground Truth Images
 Ground Truth - MRI 327 (1)
-![Ground Truth - MRI 327 (1)](images/327_gt_01.png){:height="36px" width="36px"}
-
+![Ground Truth - MRI 327 (1)](images/327_gt_01.png)
+<img src="images/327_gt_01.png" alt="Ground Truth - MRI 327 (1)" width="250"/>
 Ground Truth - MRI 327 (2)
-![Ground Truth - MRI 327 (2)](images/327_gt_02.png){:height="36px" width="36px"}
+![Ground Truth - MRI 327 (2)](images/327_gt_02.png)
 #### Predicted Images
 Prediction   - MRI 327 (1)
 ![Prediction   - MRI 327 (1)](images/327_pred_01.png)
