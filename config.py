@@ -36,7 +36,7 @@ class SemSegMRIConfig(SemSegConfig):
     pad_ref = (48, 64, 48)
     lr = 0.01
     epochs = 100
-    low_lr_epoch = epochs // 5
+    low_lr_epoch = epochs // 3
     val_epochs = epochs // 5
     cuda = True
     num_outs = 3
