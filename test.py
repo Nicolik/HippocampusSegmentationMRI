@@ -16,8 +16,9 @@ import SimpleITK as sitk
 ##########################
 from config import *
 from semseg.data_loader import min_max_normalization, zero_pad_3d_image, z_score_normalization
-from semseg.utils import multi_dice_coeff
+from semseg.utils import multi_dice_coeff, plot_confusion_matrix
 from models.vnet3d import VNet3D
+from sklearn.metrics import confusion_matrix, f1_score
 
 ##########################
 # Config
@@ -49,11 +50,13 @@ net.eval()
 ###########################
 pad_ref = (48,64,48)
 multi_dices = list()
+f1_scores = np.zeros((len(train_images),config.num_outs-1))
 
 train_and_test = [True, False]
 train_and_test_images = [train_images, test_images]
 train_and_test_images_folder = [train_images_folder, test_images_folder]
 train_and_test_prediction_folder = [train_prediction_folder, test_prediction_folder]
+train_confusion_matrix = np.zeros((config.num_outs, config.num_outs))
 
 for train_or_test_images, train_or_test_images_folder, train_or_test_prediction_folder, is_training in \
         zip(train_and_test_images, train_and_test_images_folder, train_and_test_prediction_folder, train_and_test):
@@ -112,9 +115,40 @@ for train_or_test_images, train_or_test_images_folder, train_or_test_prediction_
             print("Multi Class Dice Coeff = {:.4f}".format(multi_dice))
             multi_dices.append(multi_dice)
 
+            f1_score_idx = f1_score(train_label_np.flatten(), outputs_np.flatten(), average=None)
+            cm_idx = confusion_matrix(train_label_np.flatten(), outputs_np.flatten())
+            train_confusion_matrix += cm_idx
+            f1_scores[idx,:] = f1_score_idx[1:]
+
 multi_dices_np = np.array(multi_dices)
 mean_multi_dice = np.mean(multi_dices_np)
 std_multi_dice  = np.std(multi_dices_np,ddof=1)
 
-print("Multi Class Dice       ===> {:.4f} +/- {:.4f}".format(mean_multi_dice, std_multi_dice))
-print("Images with Dice > 0.8 ===> {} on {}".format((multi_dices_np>0.8).sum(),multi_dices_np.size))
+f1_scores_anterior_mean = np.mean(f1_scores[:,0])
+f1_scores_anterior_std = np.std(f1_scores[:,0],ddof=1)
+
+f1_scores_posterior_mean = np.mean(f1_scores[:,1])
+f1_scores_posterior_std = np.std(f1_scores[:,1],ddof=1)
+
+print("+================================+")
+print("Multi Class Dice           ===> {:.4f} +/- {:.4f}".format(mean_multi_dice, std_multi_dice))
+print("Images with Dice > 0.8     ===> {} on {}".format((multi_dices_np>0.8).sum(),multi_dices_np.size))
+print("+================================+")
+print("Hippocampus Anterior Dice  ===> {:.4f} +/- {:.4f}".format(f1_scores_anterior_mean, f1_scores_anterior_std))
+print("Hippocampus Posterior Dice ===> {:.4f} +/- {:.4f}".format(f1_scores_posterior_mean, f1_scores_posterior_std))
+print("+================================+")
+print("Confusion Matrix")
+print(train_confusion_matrix)
+print("+================================+")
+print("Normalized (All) Confusion Matrix")
+train_confusion_matrix_normalized_all = train_confusion_matrix/train_confusion_matrix.sum()
+print(train_confusion_matrix_normalized_all)
+print("+================================+")
+print("Normalized (Row) Confusion Matrix")
+train_confusion_matrix_normalized_row = train_confusion_matrix.astype('float') / \
+                                        train_confusion_matrix.sum(axis=1)[:, np.newaxis]
+print(train_confusion_matrix_normalized_row)
+print("+================================+")
+fig = plot_confusion_matrix(train_confusion_matrix_normalized_row,
+                      target_names=None, title='Train Confusion matrix',
+                      cmap=None, normalize=False, already_normalized=True, path_out="images/conf_matrix.png")

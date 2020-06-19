@@ -6,9 +6,7 @@
 ##########################
 # Imports
 ##########################
-import os
 import numpy as np
-import pickle
 import torch
 import torch.optim as optim
 from sklearn.model_selection import KFold
@@ -17,7 +15,7 @@ from sklearn.model_selection import KFold
 # Local Imports
 ##########################
 from config import *
-from semseg.utils import train_model, val_model
+from semseg.utils import train_model, val_model, train_val_split
 from semseg.data_loader import GetDataLoader3DTraining, GenDataLoader3DValidation
 from models.vnet3d import VNet3D
 
@@ -77,15 +75,8 @@ if config.do_crossval:
     for idx, (train_index, val_index) in enumerate(kf.split(test_images)):
         print("[Folder {:d}]".format(idx))
         print("TRAIN:", train_index, "VAL:", val_index)
-        train_images_np,train_labels_np = np.array(train_images), np.array(train_labels)
-        train_images_list = list(train_images_np[train_index])
-        train_images_list = [os.path.join(train_images_folder, train_image) for train_image in train_images_list]
-        val_images_list = list(train_images_np[val_index])
-        val_images_list = [os.path.join(train_images_folder, val_image) for val_image in val_images_list]
-        train_labels_list = list(train_labels_np[train_index])
-        train_labels_list = [os.path.join(train_labels_folder, train_label) for train_label in train_labels_list]
-        val_labels_list = list(train_labels_np[val_index])
-        val_labels_list = [os.path.join(train_labels_folder, val_label) for val_label in val_labels_list]
+        train_images_list, val_images_list, train_labels_list, val_labels_list = \
+            train_val_split(train_images, train_labels, train_index, val_index)
         config.train_images, config.val_images = train_images_list, val_images_list
         config.train_labels, config.val_labels = train_labels_list, val_labels_list
 

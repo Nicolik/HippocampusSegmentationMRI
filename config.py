@@ -25,6 +25,12 @@ test_images = os.listdir(test_images_folder)
 test_prediction_folder = os.path.join(base_dataset_dir, "predTs")
 os.makedirs(test_prediction_folder, exist_ok=True)
 
+labels_names = {
+   "0": "background",
+   "1": "Anterior",
+   "2": "Posterior"
+ }
+labels_names_list = [labels_names[el] for el in labels_names]
 
 class SemSegMRIConfig(SemSegConfig):
     train_images = [os.path.join(train_images_folder, train_image)
