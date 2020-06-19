@@ -10,13 +10,14 @@ import torch
 import os
 import numpy as np
 import SimpleITK as sitk
+from sklearn.model_selection import KFold
 
 ##########################
 # Local Imports
 ##########################
 from config import *
 from semseg.data_loader import min_max_normalization, zero_pad_3d_image, z_score_normalization
-from semseg.utils import multi_dice_coeff, plot_confusion_matrix
+from semseg.utils import multi_dice_coeff, plot_confusion_matrix, train_val_split
 from models.vnet3d import VNet3D
 from sklearn.metrics import confusion_matrix, f1_score
 
@@ -34,23 +35,21 @@ for item in attributes_config:
 # Load Net
 ###########################
 cuda_dev = torch.device("cuda")
-use_final_model = True
-if use_final_model:
-    path_net = "logs/model.pt"
-    net = torch.load(path_net)
-else:
-    path_net = "logs/model_epoch_0080.pht"
-    net = VNet3D(num_outs=config.num_outs, channels=config.num_channels)
-    net.load_state_dict(torch.load(path_net))
-net = net.cuda(cuda_dev)
-net.eval()
+
+# Load From State Dict
+# path_net = "logs/model_epoch_0080.pht"
+# net = VNet3D(num_outs=config.num_outs, channels=config.num_channels)
+# net.load_state_dict(torch.load(path_net))
+
+path_net = "logs/model.pt"
+path_nets_crossval = ["logs/model_folder_{:d}.pt".format(idx) for idx in range(config.num_folders)]
 
 ###########################
 # Eval Loop
 ###########################
 pad_ref = (48,64,48)
 multi_dices = list()
-f1_scores = np.zeros((len(train_images),config.num_outs-1))
+f1_scores = list()
 
 train_and_test = [True, False]
 train_and_test_images = [train_images, test_images]
@@ -62,73 +61,101 @@ for train_or_test_images, train_or_test_images_folder, train_or_test_prediction_
         zip(train_and_test_images, train_and_test_images_folder, train_and_test_prediction_folder, train_and_test):
     print("Images Folder: {}".format(train_or_test_images_folder))
     print("IsTraining: {}".format(is_training))
-    for idx, train_image in enumerate(train_or_test_images):
-        print("Iter {} on {}".format(idx,len(train_or_test_images)))
-        print("Image: {}".format(train_image))
-        train_image_path = os.path.join(train_or_test_images_folder, train_image)
 
-        train_image_sitk = sitk.ReadImage(train_image_path)
-        train_image_np = sitk.GetArrayFromImage(train_image_sitk)
-
-        origin, spacing, direction = train_image_sitk.GetOrigin(), \
-                                     train_image_sitk.GetSpacing(), train_image_sitk.GetDirection()
-        print("Origin        {}".format(origin))
-        print("Spacing       {}".format(spacing))
-        print("Direction     {}".format(direction))
-
-        train_image_np = z_score_normalization(train_image_np)
-
-        inputs_padded = zero_pad_3d_image(train_image_np, pad_ref,
-                                          value_to_pad=train_image_np.min())
-                                                                   #         Z x Y x X
-        inputs_padded = np.expand_dims(inputs_padded,axis=0)       #     1 x Z x Y x X
-        inputs_padded = np.expand_dims(inputs_padded,axis=0)       # 1 x 1 x Z x Y x X
-
-        with torch.no_grad():
-            inputs = torch.from_numpy(inputs_padded).float()
-            inputs = inputs.to(cuda_dev)
-            outputs = net(inputs) # 1 x K x Z x Y x X
-            outputs = torch.argmax(outputs, dim=1) # 1 x Z x Y x X
-            outputs_np = outputs.data.cpu().numpy()
-
-        outputs_np = outputs_np[0] # Z x Y x X
-        outputs_np = outputs_np[:train_image_np.shape[0],
-                                :train_image_np.shape[1],
-                                :train_image_np.shape[2]]
-        outputs_np = outputs_np.astype(np.uint8)
-        outputs_sitk = sitk.GetImageFromArray(outputs_np)
-        outputs_sitk.SetDirection(direction)
-        outputs_sitk.SetSpacing(spacing)
-        outputs_sitk.SetOrigin(origin)
-        print("Sum Outputs = {}".format(outputs_np.sum()))
-        filename_out = os.path.join(train_or_test_prediction_folder, train_image)
-        sitk.WriteImage(outputs_sitk, filename_out)
-
+    kf = KFold(n_splits=config.num_folders)
+    for idx_crossval, (train_index, val_index) in enumerate(kf.split(train_images)):
         if is_training:
-            train_label = train_labels[idx]
-            train_label_path = os.path.join(train_labels_folder, train_label)
-            train_label_sitk = sitk.ReadImage(train_label_path)
-            train_label_np = sitk.GetArrayFromImage(train_label_sitk)
-            multi_dice = multi_dice_coeff(np.expand_dims(train_label_np,axis=0),
-                                          np.expand_dims(outputs_np,axis=0),
-                                          config.num_outs)
-            print("Multi Class Dice Coeff = {:.4f}".format(multi_dice))
-            multi_dices.append(multi_dice)
+            print("+==================+")
+            print("+ Cross Validation +")
+            print("+     Folder {:d}     +".format(idx_crossval))
+            print("+==================+")
+            print("TRAIN [Images: {:3d}]:\n{}".format(len(train_index), train_index))
+            print("VAL   [Images: {:3d}]:\n{}".format(len(val_index), val_index))
+            model_path = path_nets_crossval[idx_crossval]
+            print("Model: {}".format(model_path))
+            net = torch.load(model_path)
+            _, train_or_test_images, _, train_labels_crossval = \
+                train_val_split(train_images, train_labels, train_index, val_index, do_join=False)
+        else:
+            print("+============+")
+            print("+   Test     +")
+            print("+============+")
+            net = torch.load(path_net)
+        net = net.cuda(cuda_dev)
+        net.eval()
 
-            f1_score_idx = f1_score(train_label_np.flatten(), outputs_np.flatten(), average=None)
-            cm_idx = confusion_matrix(train_label_np.flatten(), outputs_np.flatten())
-            train_confusion_matrix += cm_idx
-            f1_scores[idx,:] = f1_score_idx[1:]
+        for idx, train_image in enumerate(train_or_test_images):
+            print("Iter {} on {}".format(idx,len(train_or_test_images)))
+            print("Image: {}".format(train_image))
+            train_image_path = os.path.join(train_or_test_images_folder, train_image)
+
+            train_image_sitk = sitk.ReadImage(train_image_path)
+            train_image_np = sitk.GetArrayFromImage(train_image_sitk)
+
+            origin, spacing, direction = train_image_sitk.GetOrigin(), \
+                                         train_image_sitk.GetSpacing(), train_image_sitk.GetDirection()
+            # print("Origin        {}".format(origin))
+            # print("Spacing       {}".format(spacing))
+            # print("Direction     {}".format(direction))
+
+            train_image_np = z_score_normalization(train_image_np)
+
+            inputs_padded = zero_pad_3d_image(train_image_np, pad_ref,
+                                              value_to_pad=train_image_np.min())
+                                                                       #         Z x Y x X
+            inputs_padded = np.expand_dims(inputs_padded,axis=0)       #     1 x Z x Y x X
+            inputs_padded = np.expand_dims(inputs_padded,axis=0)       # 1 x 1 x Z x Y x X
+
+            with torch.no_grad():
+                inputs = torch.from_numpy(inputs_padded).float()
+                inputs = inputs.to(cuda_dev)
+                outputs = net(inputs) # 1 x K x Z x Y x X
+                outputs = torch.argmax(outputs, dim=1) # 1 x Z x Y x X
+                outputs_np = outputs.data.cpu().numpy()
+
+            outputs_np = outputs_np[0] # Z x Y x X
+            outputs_np = outputs_np[:train_image_np.shape[0],
+                                    :train_image_np.shape[1],
+                                    :train_image_np.shape[2]]
+            outputs_np = outputs_np.astype(np.uint8)
+            outputs_sitk = sitk.GetImageFromArray(outputs_np)
+            outputs_sitk.SetDirection(direction)
+            outputs_sitk.SetSpacing(spacing)
+            outputs_sitk.SetOrigin(origin)
+            # print("Sum Outputs = {}".format(outputs_np.sum()))
+            filename_out = os.path.join(train_or_test_prediction_folder, train_image)
+            sitk.WriteImage(outputs_sitk, filename_out)
+
+            if is_training:
+                train_label = train_labels_crossval[idx]
+                train_label_path = os.path.join(train_labels_folder, train_label)
+                train_label_sitk = sitk.ReadImage(train_label_path)
+                train_label_np = sitk.GetArrayFromImage(train_label_sitk)
+                multi_dice = multi_dice_coeff(np.expand_dims(train_label_np,axis=0),
+                                              np.expand_dims(outputs_np,axis=0),
+                                              config.num_outs)
+                print("Multi Class Dice Coeff = {:.4f}".format(multi_dice))
+                multi_dices.append(multi_dice)
+
+                f1_score_idx = f1_score(train_label_np.flatten(), outputs_np.flatten(), average=None)
+                cm_idx = confusion_matrix(train_label_np.flatten(), outputs_np.flatten())
+                train_confusion_matrix += cm_idx
+                f1_scores.append(f1_score_idx)
+
+        if not is_training:
+            break
 
 multi_dices_np = np.array(multi_dices)
 mean_multi_dice = np.mean(multi_dices_np)
 std_multi_dice  = np.std(multi_dices_np,ddof=1)
 
-f1_scores_anterior_mean = np.mean(f1_scores[:,0])
-f1_scores_anterior_std = np.std(f1_scores[:,0],ddof=1)
+f1_scores = np.array(f1_scores)
 
-f1_scores_posterior_mean = np.mean(f1_scores[:,1])
-f1_scores_posterior_std = np.std(f1_scores[:,1],ddof=1)
+f1_scores_anterior_mean = np.mean(f1_scores[:,1])
+f1_scores_anterior_std = np.std(f1_scores[:,1],ddof=1)
+
+f1_scores_posterior_mean = np.mean(f1_scores[:,2])
+f1_scores_posterior_std = np.std(f1_scores[:,2],ddof=1)
 
 print("+================================+")
 print("Multi Class Dice           ===> {:.4f} +/- {:.4f}".format(mean_multi_dice, std_multi_dice))

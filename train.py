@@ -30,7 +30,6 @@ assert num_train_images == num_train_labels, "Mismatch in number of training ima
 print("There are: {} Training Images".format(num_train_images))
 print("There are: {} Training Labels".format(num_train_labels))
 
-
 ##########################
 # Config
 ##########################
@@ -72,9 +71,13 @@ if config.do_crossval:
     std_multi_dice_crossval = list()
 
     kf = KFold(n_splits=config.num_folders)
-    for idx, (train_index, val_index) in enumerate(kf.split(test_images)):
-        print("[Folder {:d}]".format(idx))
-        print("TRAIN:", train_index, "VAL:", val_index)
+    for idx, (train_index, val_index) in enumerate(kf.split(train_images)):
+        print("+==================+")
+        print("+ Cross Validation +")
+        print("+     Folder {:d}     +".format(idx))
+        print("+==================+")
+        print("TRAIN [Images: {:3d}]:\n{}".format(len(train_index), train_index))
+        print("VAL   [Images: {:3d}]:\n{}".format(len(val_index), val_index))
         train_images_list, val_images_list, train_labels_list, val_labels_list = \
             train_val_split(train_images, train_labels, train_index, val_index)
         config.train_images, config.val_images = train_images_list, val_images_list

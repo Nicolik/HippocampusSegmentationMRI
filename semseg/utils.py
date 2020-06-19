@@ -129,16 +129,17 @@ def one_hot_encode_np(label, num_classes):
     return label_ohe
 
 
-def train_val_split(train_images, train_labels, train_index, val_index):
+def train_val_split(train_images, train_labels, train_index, val_index, do_join=True):
     train_images_np, train_labels_np = np.array(train_images), np.array(train_labels)
     train_images_list = list(train_images_np[train_index])
-    train_images_list = [os.path.join(train_images_folder, train_image) for train_image in train_images_list]
     val_images_list = list(train_images_np[val_index])
-    val_images_list = [os.path.join(train_images_folder, val_image) for val_image in val_images_list]
     train_labels_list = list(train_labels_np[train_index])
-    train_labels_list = [os.path.join(train_labels_folder, train_label) for train_label in train_labels_list]
     val_labels_list = list(train_labels_np[val_index])
-    val_labels_list = [os.path.join(train_labels_folder, val_label) for val_label in val_labels_list]
+    if do_join:
+        train_images_list = [os.path.join(train_images_folder, train_image) for train_image in train_images_list]
+        val_images_list = [os.path.join(train_images_folder, val_image) for val_image in val_images_list]
+        train_labels_list = [os.path.join(train_labels_folder, train_label) for train_label in train_labels_list]
+        val_labels_list = [os.path.join(train_labels_folder, val_label) for val_label in val_labels_list]
     return train_images_list, val_images_list, train_labels_list, val_labels_list
 
 
