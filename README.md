@@ -51,6 +51,7 @@ Meshes and images reported in the ```images``` folder have been obtained exploit
 </th>
 <tr>
 </table>
+
 ### TODO List
 - [x] CNN Architecture Definition
 - [x] 3D Data Loader for Nifti files
