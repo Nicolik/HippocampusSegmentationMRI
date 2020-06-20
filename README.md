@@ -37,8 +37,20 @@ Meshes and images reported in the ```images``` folder have been obtained exploit
 </table>
 
 ### Confusion Matrix
+<table>
+<tr>
+<th>Confusion Matrix</th>
+<th>Normalized Confusion Matrix</th>
+</tr>
+<tr>
+<th>
 <img src="images/conf_matrix.png" alt="Confusion Matrix (Cross-validation)" width="400"/>
-
+</th>
+<th>
+<img src="images/conf_matrix_normalized_row.png" alt="Normalized Confusion Matrix (Cross-validation)" width="400"/>
+</th>
+<tr>
+</table>
 ### TODO List
 - [x] CNN Architecture Definition
 - [x] 3D Data Loader for Nifti files

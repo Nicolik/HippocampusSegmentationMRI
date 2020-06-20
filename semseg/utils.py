@@ -197,7 +197,7 @@ def plot_confusion_matrix(cm,
 
     plt.figure(figsize=(8, 8))
     plt.matshow(cm, cmap=cmap)
-    plt.title(title, pad=15.)
+    plt.title(title, pad=25.)
     plt.colorbar()
 
     if target_names is not None:

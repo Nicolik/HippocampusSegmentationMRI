@@ -176,6 +176,11 @@ train_confusion_matrix_normalized_row = train_confusion_matrix.astype('float') /
                                         train_confusion_matrix.sum(axis=1)[:, np.newaxis]
 print(train_confusion_matrix_normalized_row)
 print("+================================+")
-fig = plot_confusion_matrix(train_confusion_matrix,
-                      target_names=None, title='Train Confusion matrix',
-                      cmap=None, normalize=True, already_normalized=False, path_out="images/conf_matrix.png")
+plot_confusion_matrix(train_confusion_matrix,
+                      target_names=None, title='Cross-Validation Confusion matrix',
+                      cmap=None, normalize=False, already_normalized=False,
+                      path_out="images/conf_matrix.png")
+plot_confusion_matrix(train_confusion_matrix,
+                      target_names=None, title='Cross-Validation Confusion matrix (row-normalized)',
+                      cmap=None, normalize=True, already_normalized=False,
+                      path_out="images/conf_matrix_normalized_row.png")
