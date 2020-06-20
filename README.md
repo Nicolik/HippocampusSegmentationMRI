@@ -10,11 +10,34 @@ The [PyTorch](https://pytorch.org/) library has been used to write the model arc
 and performing the training and validation. [SimpleITK](https://simpleitk.org/) 
 has been exploited to handle I/O of medical images.
 A 5-folders cross validation has been performed on the training set, yielding a 
-Mean Multi Dice Coefficient of 0.8789 +/- 0.0211.
-The result is reported as "mean +/- std". This result has been calculated by 
-considering batches of 4 images in the cross-validation process.
+Mean Multi Dice Coefficient of 0.8719 +/- 0.0387, a Dice Coefficient for 
+Anterior Hippocampus of 0.8821 +/- 0.0367 and a Dice Coefficient for 
+Posterior Hippocampus of 0.8617 +/- 0.0482.
+The results are reported as "mean +/- std". 
 Meshes and images reported in the ```images``` folder have been obtained exploiting 
 [ITK-SNAP](http://www.itksnap.org/).
+
+### Quality Measures
+<table>
+<tr>
+<th colspan="4">Results</th>
+</tr>
+<tr>
+<th> Model </th>
+<th> Mean Multi Dice </th>
+<th> Dice (Anterior  Hippocampus) </th>
+<th> Dice (Posterior Hippocampus) </th>
+</tr>
+<tr>
+<td>3D V-Net (No Data Augmentation)</td>
+<td>0.8719 +/- 0.0387</td>
+<td>0.8821 +/- 0.0367</td>
+<td>0.8617 +/- 0.0482</td>
+</tr>
+</table>
+
+#### Confusion Matrix
+<img src="images/conf_matrix.png" alt="Confusion Matrix (Cross-validation)" width="400"/>
 
 ### TODO List
 - [x] CNN Architecture Definition

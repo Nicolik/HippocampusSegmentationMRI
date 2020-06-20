@@ -111,7 +111,7 @@ if config.do_crossval:
     mean_multi_dice_crossval_flatten = np.mean(multi_dices_crossval_flatten)
     std_multi_dice_crossval_flatten = np.std(multi_dices_crossval_flatten)
     print("Multi-Dice: {:.4f} +/- {:.4f}".format(mean_multi_dice_crossval_flatten, std_multi_dice_crossval_flatten))
-    # Multi-Dice: 0.8789 +/- 0.0211
+    # Multi-Dice: 0.8728 +/- 0.0227
 
 ##########################
 # Training (full training set)
