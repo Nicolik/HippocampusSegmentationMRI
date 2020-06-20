@@ -36,7 +36,7 @@ Meshes and images reported in the ```images``` folder have been obtained exploit
 </tr>
 </table>
 
-#### Confusion Matrix
+### Confusion Matrix
 <img src="images/conf_matrix.png" alt="Confusion Matrix (Cross-validation)" width="400"/>
 
 ### TODO List

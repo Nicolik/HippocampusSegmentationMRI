@@ -192,6 +192,9 @@ def plot_confusion_matrix(cm,
     if cmap is None:
         cmap = plt.get_cmap('Blues')
 
+    if normalize:
+        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+
     plt.figure(figsize=(8, 8))
     plt.matshow(cm, cmap=cmap)
     plt.title(title, pad=15.)
@@ -202,10 +205,8 @@ def plot_confusion_matrix(cm,
         plt.xticks(tick_marks, target_names, rotation=45)
         plt.yticks(tick_marks, target_names)
 
-    if normalize:
-        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-
     thresh = cm.max() / 1.5 if normalize or already_normalized else cm.max() / 2
+    print("Thresh = {}".format(thresh))
     for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
         if normalize or already_normalized:
             plt.text(j, i, "{:0.4f}".format(cm[i, j]),
