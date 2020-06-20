@@ -44,7 +44,7 @@ Meshes and images reported in the ```images``` folder have been obtained exploit
 </tr>
 <tr>
 <th>
-<img src="images/conf_matrix.png" alt="Confusion Matrix (Cross-validation)" width="400"/>
+<img src="images/conf_matrix_no_norm.png" alt="Confusion Matrix (Cross-validation)" width="400"/>
 </th>
 <th>
 <img src="images/conf_matrix_normalized_row.png" alt="Normalized Confusion Matrix (Cross-validation)" width="400"/>

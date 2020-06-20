@@ -179,7 +179,7 @@ print("+================================+")
 plot_confusion_matrix(train_confusion_matrix,
                       target_names=None, title='Cross-Validation Confusion matrix',
                       cmap=None, normalize=False, already_normalized=False,
-                      path_out="images/conf_matrix.png")
+                      path_out="images/conf_matrix_no_norm.png")
 plot_confusion_matrix(train_confusion_matrix,
                       target_names=None, title='Cross-Validation Confusion matrix (row-normalized)',
                       cmap=None, normalize=True, already_normalized=False,
