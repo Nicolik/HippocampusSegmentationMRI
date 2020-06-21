@@ -24,9 +24,9 @@ Meshes and images reported in the ```images``` folder have been obtained exploit
 </tr>
 <tr>
 <th> Model </th>
-<th> Mean Multi Dice </th>
-<th> Dice (Anterior  Hippocampus) </th>
-<th> Dice (Posterior Hippocampus) </th>
+<th> Mean Dice per case </th>
+<th> Dice per case (Anterior  Hippocampus) </th>
+<th> Dice per case (Posterior Hippocampus) </th>
 </tr>
 <tr>
 <td>3D V-Net (no data augmentation)</td>
