@@ -6,6 +6,7 @@ import numpy as np
 from config import train_images_folder, train_labels_folder
 from semseg.loss import get_multi_dice_loss, LEARNING_RATE_REDUCTION_FACTOR, one_hot_encode
 
+
 def train_model(net, optimizer, train_data, config,
                 device=None, logs_folder=None):
 
@@ -29,7 +30,8 @@ def train_model(net, optimizer, train_data, config,
         for i, data in enumerate(train_data):
 
             inputs, labels = data
-            if config.cuda: inputs, labels = inputs.cuda(), labels.cuda()
+            if config.cuda:
+                inputs, labels = inputs.cuda(), labels.cuda()
 
             # forward pass
             outputs = net(inputs)

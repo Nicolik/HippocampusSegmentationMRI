@@ -26,8 +26,6 @@ class DownConvBlock2b(nn.Module):
         super().__init__()
         self.out_channels = out_channels
 
-        ConvND = nn.Conv3d
-
         self.conv_a = nn.Conv3d(in_channels=out_channels, out_channels=out_channels, kernel_size=5, stride=1, padding=2)
         self.bn_a = nn.BatchNorm3d(out_channels)
         self.conv_b = nn.Conv3d(in_channels=out_channels, out_channels=out_channels, kernel_size=5, stride=1, padding=2)

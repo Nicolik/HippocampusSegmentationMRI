@@ -29,17 +29,24 @@ Meshes and images reported in the ```images``` folder have been obtained exploit
 <th> Dice (Posterior Hippocampus) </th>
 </tr>
 <tr>
-<td>3D V-Net (No Data Augmentation)</td>
+<td>3D V-Net (no data augmentation)</td>
 <td>0.8719 +/- 0.0387</td>
 <td>0.8821 +/- 0.0367</td>
 <td>0.8617 +/- 0.0482</td>
 </tr>
+<tr>
+<td>3D V-Net (with data augmentation)</td>
+<td> 0.8761 +/- 0.0374 </td>
+<td> 0.8875 +/- 0.0354 </td>
+<td> 0.8647 +/- 0.0455 </td>
+</tr>
 </table>
 
-### Confusion Matrix
+### Confusion Matrices
+#### No Data Augmentation
 <table>
 <tr>
-<th>Confusion Matrix</th>
+<th>Confusion Matrix </th>
 <th>Normalized Confusion Matrix</th>
 </tr>
 <tr>
@@ -51,6 +58,23 @@ Meshes and images reported in the ```images``` folder have been obtained exploit
 </th>
 <tr>
 </table>
+
+#### With Data Augmentation
+<table>
+<tr>
+<th>Confusion Matrix </th>
+<th>Normalized Confusion Matrix</th>
+</tr>
+<tr>
+<th>
+<img src="images/conf_matrix_no_norm_augm.png" alt="Confusion Matrix (Cross-validation)" width="400"/>
+</th>
+<th>
+<img src="images/conf_matrix_normalized_row_augm.png" alt="Normalized Confusion Matrix (Cross-validation)" width="400"/>
+</th>
+<tr>
+</table>
+
 
 ### TODO List
 - [x] CNN Architecture Definition

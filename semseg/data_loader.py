@@ -63,8 +63,18 @@ class Dataset3DFull(torch.utils.data.Dataset):
         return (features, targets)
 
     def perform_augmentation(self, inputs, labels):
-        # TODO: implement some augmentation technique
-        return (inputs, labels)
+        # TODO: implement really 3D Augmentations
+        # Store shapes before augmentation to compare
+        image_shape = inputs.shape
+        mask_shape = labels.shape
+        # Make augmenters deterministic to apply similarly to images and masks
+        det = self.augmentation.to_deterministic()
+        image = det.augment_image(inputs.astype(np.float32))
+        mask = det.augment_image(labels.astype(np.uint8))
+        # Verify that shapes didn't change
+        assert image.shape == image_shape, "Augmentation shouldn't change image size"
+        assert mask.shape == mask_shape, "Augmentation shouldn't change mask size"
+        return (image, mask)
 
     def normalize(self, inputs):
         return z_score_normalization(inputs)

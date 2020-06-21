@@ -1,4 +1,5 @@
 import os
+from imgaug import augmenters as iaa
 from semseg.data_loader import SemSegConfig
 
 logs_folder = "logs"
@@ -31,6 +32,13 @@ labels_names = {
    "2": "Posterior"
  }
 labels_names_list = [labels_names[el] for el in labels_names]
+
+augmentation_list = iaa.SomeOf((0,2), [
+                iaa.GaussianBlur(sigma=(0.0, 0.1)),
+                iaa.ElasticTransformation(alpha=(3,5), sigma=2.5),
+                iaa.Multiply((0.98, 1.02)),
+            ])
+
 
 class SemSegMRIConfig(SemSegConfig):
     train_images = [os.path.join(train_images_folder, train_image)
