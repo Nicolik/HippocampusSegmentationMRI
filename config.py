@@ -1,5 +1,9 @@
 import os
 from imgaug import augmenters as iaa
+import torchio
+from torchio.transforms import (ZNormalization, RandomAffine, Compose,
+                                RandomElasticDeformation, LambdaChannel)
+from semseg.data_loader_torchio import get_zero_pad_3d_image
 from semseg.data_loader import SemSegConfig
 
 logs_folder = "logs"
@@ -40,6 +44,21 @@ augmentation_list = iaa.SomeOf((0,2), [
             ])
 
 
+train_transforms_dict = {
+    ZNormalization(): 1.0,
+    RandomAffine(): 0.75,
+    RandomElasticDeformation(max_displacement=3): 0.25,
+    LambdaChannel(get_zero_pad_3d_image(pad_ref=(48, 64, 48))): 1.0,
+}
+train_transform = Compose(train_transforms_dict)
+
+val_transforms_dict = {
+    ZNormalization(): 1.0,
+    LambdaChannel(get_zero_pad_3d_image(pad_ref=(48, 64, 48))): 1.0,
+}
+val_transform = Compose(val_transforms_dict)
+
+
 class SemSegMRIConfig(SemSegConfig):
     train_images = [os.path.join(train_images_folder, train_image)
                     for train_image in train_images]
@@ -61,3 +80,5 @@ class SemSegMRIConfig(SemSegConfig):
     do_crossval = True
     num_folders = 5
     num_channels = 8
+    transform_train = train_transform
+    transform_val = val_transform

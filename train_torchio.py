@@ -16,8 +16,8 @@ from sklearn.model_selection import KFold
 ##########################
 from config import *
 from semseg.utils import train_val_split
-from semseg.train import train_model, val_model
-from semseg.data_loader import GetDataLoader3DTraining, GenDataLoader3DValidation
+from semseg.train_torchio import train_model, val_model
+from semseg.data_loader_torchio import TorchIODataLoader3DTraining, TorchIODataLoader3DValidation
 from models.vnet3d import VNet3D
 
 ##########################
@@ -44,9 +44,10 @@ for item in attributes_config:
 ##########################
 # Check Torch Dataset and DataLoader
 ##########################
-train_data_loader_3D = GetDataLoader3DTraining(config)
+train_data_loader_3D = TorchIODataLoader3DTraining(config)
 iterable_data_loader = iter(train_data_loader_3D)
-inputs,labels = next(iterable_data_loader)
+el = next(iterable_data_loader)
+inputs, labels = el['t1']['data'], el['label']['data']
 print("Shape of Batch: [input {}] [label {}]".format(inputs.shape, labels.shape))
 
 ##########################
@@ -90,14 +91,14 @@ if config.do_crossval:
         net = VNet3D(num_outs=config.num_outs, channels=config.num_channels)
         config.lr = 0.01
         optimizer = optim.Adam(net.parameters(), lr=config.lr)
-        train_data_loader_3D = GetDataLoader3DTraining(config)
+        train_data_loader_3D = TorchIODataLoader3DTraining(config)
         net = train_model(net, optimizer, train_data_loader_3D,
                           config, device=cuda_dev, logs_folder=logs_folder)
 
         ##########################
         # Validation (cross-validation)
         ##########################
-        val_data_loader_3D = GenDataLoader3DValidation(config)
+        val_data_loader_3D = TorchIODataLoader3DValidation(config)
         multi_dices, mean_multi_dice, std_multi_dice = val_model(net, val_data_loader_3D,
                                                                  config, device=cuda_dev)
         multi_dices_crossval.append(multi_dices)
@@ -124,7 +125,7 @@ config.train_labels = [os.path.join(train_labels_folder, train_label)
 net = VNet3D(num_outs=config.num_outs, channels=config.num_channels)
 config.lr = 0.01
 optimizer = optim.Adam(net.parameters(), lr=config.lr)
-train_data_loader_3D = GetDataLoader3DTraining(config)
+train_data_loader_3D = TorchIODataLoader3DTraining(config)
 net = train_model(net, optimizer, train_data_loader_3D,
                   config, device=cuda_dev, logs_folder=logs_folder)
 
