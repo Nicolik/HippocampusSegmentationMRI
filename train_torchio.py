@@ -130,5 +130,3 @@ net = train_model(net, optimizer, train_data_loader_3D,
                   config, device=cuda_dev, logs_folder=logs_folder)
 
 torch.save(net,os.path.join(logs_folder,"model.pt"))
-
-
