@@ -1,13 +1,15 @@
 import torch
 from torchio import ImagesDataset, Image
 from config import *
-from semseg.data_loader_torchio import get_zero_pad_3d_image
+from semseg.data_loader_torchio import get_pad_3d_image
+from augm.lambda_channel import LambdaChannel
 
 transforms_dict = {
     ZNormalization(): 1.0,
-    RandomAffine(): 0.75,
-    RandomElasticDeformation(max_displacement=3): 0.25,
-    LambdaChannel(get_zero_pad_3d_image(pad_ref=(48, 64, 48))): 1.0,
+    # LambdaChannel(z_score_normalization, types_to_apply=torchio.INTENSITY): 1.0,
+    # RandomAffine(): 0.25,
+    # RandomElasticDeformation(max_displacement=3): 0.25,
+    LambdaChannel(get_pad_3d_image(pad_ref=(48, 64, 48), zero_pad=False)): 1.0,
 }
 
 transform = Compose(transforms_dict)
@@ -38,9 +40,9 @@ for idx in range(0,len(train_images[:10])):
     print("label.unique   = {}".format(subject_sample.label.data.unique()))
 
 
-config = SemSegMRIConfig
+config = SemSegMRIConfig()
 train_data = torch.utils.data.DataLoader(subjects_dataset, batch_size=config.batch_size,
-                                         shuffle=True, num_workers=config.num_workers)
+                                         shuffle=False, num_workers=config.num_workers)
 
 
 iterable_data_loader = iter(train_data)
@@ -54,3 +56,4 @@ for i, el in enumerate(train_data):
     inputs = el['t1']['data']
     labels = el['label']['data']
     print("Shape of Batch: [input {}] [label {}]".format(inputs.shape, labels.shape))
+    print("Range Inputs  : [{:.2f} %% {:.2f}]".format(inputs.min(),inputs.max()))

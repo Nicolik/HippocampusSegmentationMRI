@@ -10,6 +10,7 @@ import torch
 import os
 import numpy as np
 import SimpleITK as sitk
+import nibabel as nib
 from sklearn.model_selection import KFold
 
 ##########################
@@ -47,6 +48,7 @@ path_nets_crossval = ["logs/model_folder_{:d}.pt".format(idx) for idx in range(c
 ###########################
 # Eval Loop
 ###########################
+use_nib = True
 pad_ref = (48,64,48)
 multi_dices = list()
 f1_scores = list()
@@ -89,15 +91,19 @@ for train_or_test_images, train_or_test_images_folder, train_or_test_prediction_
             print("Image: {}".format(train_image))
             train_image_path = os.path.join(train_or_test_images_folder, train_image)
 
-            train_image_sitk = sitk.ReadImage(train_image_path)
-            train_image_np = sitk.GetArrayFromImage(train_image_sitk)
+            if use_nib:
+                train_image_nii = nib.load(str(train_image_path), mmap=False)
+                train_image_np = train_image_nii.get_fdata(dtype=np.float32)
+                affine = train_image_nii.affine
+            else:
+                train_image_sitk = sitk.ReadImage(train_image_path)
+                train_image_np = sitk.GetArrayFromImage(train_image_sitk)
+                origin, spacing, direction = train_image_sitk.GetOrigin(), \
+                                             train_image_sitk.GetSpacing(), train_image_sitk.GetDirection()
 
-            origin, spacing, direction = train_image_sitk.GetOrigin(), \
-                                         train_image_sitk.GetSpacing(), train_image_sitk.GetDirection()
-            # print("Origin        {}".format(origin))
-            # print("Spacing       {}".format(spacing))
-            # print("Direction     {}".format(direction))
-
+                # print("Origin        {}".format(origin))
+                # print("Spacing       {}".format(spacing))
+                # print("Direction     {}".format(direction))
             train_image_np = z_score_normalization(train_image_np)
 
             inputs_padded = zero_pad_3d_image(train_image_np, pad_ref,
@@ -118,19 +124,30 @@ for train_or_test_images, train_or_test_images_folder, train_or_test_prediction_
                                     :train_image_np.shape[1],
                                     :train_image_np.shape[2]]
             outputs_np = outputs_np.astype(np.uint8)
-            outputs_sitk = sitk.GetImageFromArray(outputs_np)
-            outputs_sitk.SetDirection(direction)
-            outputs_sitk.SetSpacing(spacing)
-            outputs_sitk.SetOrigin(origin)
-            # print("Sum Outputs = {}".format(outputs_np.sum()))
             filename_out = os.path.join(train_or_test_prediction_folder, train_image)
-            sitk.WriteImage(outputs_sitk, filename_out)
+            if use_nib:
+                outputs_nib = nib.Nifti1Image(outputs_np, affine)
+                outputs_nib.header['qform_code'] = 1
+                outputs_nib.header['sform_code'] = 0
+                outputs_nib.to_filename(filename_out)
+            else:
+                outputs_sitk = sitk.GetImageFromArray(outputs_np)
+                outputs_sitk.SetDirection(direction)
+                outputs_sitk.SetSpacing(spacing)
+                outputs_sitk.SetOrigin(origin)
+                # print("Sum Outputs = {}".format(outputs_np.sum()))
+                sitk.WriteImage(outputs_sitk, filename_out)
 
             if is_training:
                 train_label = train_labels_crossval[idx]
                 train_label_path = os.path.join(train_labels_folder, train_label)
-                train_label_sitk = sitk.ReadImage(train_label_path)
-                train_label_np = sitk.GetArrayFromImage(train_label_sitk)
+                if use_nib:
+                    train_label_nii = nib.load(str(train_label_path), mmap=False)
+                    train_label_np = train_label_nii.get_fdata(dtype=np.float32)
+                else:
+                    train_label_sitk = sitk.ReadImage(train_label_path)
+                    train_label_np = sitk.GetArrayFromImage(train_label_sitk)
+
                 multi_dice = multi_dice_coeff(np.expand_dims(train_label_np,axis=0),
                                               np.expand_dims(outputs_np,axis=0),
                                               config.num_outs)
@@ -179,8 +196,8 @@ print("+================================+")
 plot_confusion_matrix(train_confusion_matrix,
                       target_names=None, title='Cross-Validation Confusion matrix',
                       cmap=None, normalize=False, already_normalized=False,
-                      path_out="images/conf_matrix_no_norm_augm.png")
+                      path_out="images/conf_matrix_no_norm_augm_torchio.png")
 plot_confusion_matrix(train_confusion_matrix,
                       target_names=None, title='Cross-Validation Confusion matrix (row-normalized)',
                       cmap=None, normalize=True, already_normalized=False,
-                      path_out="images/conf_matrix_normalized_row_augm.png")
+                      path_out="images/conf_matrix_normalized_row_augm_torchio.png")

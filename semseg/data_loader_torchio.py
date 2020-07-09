@@ -42,8 +42,12 @@ def TorchIODataLoader3DValidation(config: SemSegConfig) -> torch.utils.data.Data
     return val_data
 
 
-def get_zero_pad_3d_image(pad_ref=(64,64,64), value_to_pad = 0):
-    def zero_pad_3d_image(image):
+def get_pad_3d_image(pad_ref: tuple = (64, 64, 64), zero_pad: bool = True):
+    def pad_3d_image(image):
+        if zero_pad:
+            value_to_pad = 0
+        else:
+            value_to_pad = image.min()
         pad_ref_channels = (image.shape[0], *pad_ref)
         # print("image.shape = {}".format(image.shape))
         if value_to_pad == 0:
@@ -53,4 +57,10 @@ def get_zero_pad_3d_image(pad_ref=(64,64,64), value_to_pad = 0):
         image_padded[:,:image.shape[1],:image.shape[2],:image.shape[3]] = image
         # print("image_padded.shape = {}".format(image_padded.shape))
         return image_padded
-    return zero_pad_3d_image
+    return pad_3d_image
+
+
+def z_score_normalization(inputs):
+    input_mean = torch.mean(inputs)
+    input_std = torch.std(inputs)
+    return (inputs - input_mean)/input_std
