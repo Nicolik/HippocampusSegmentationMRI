@@ -7,7 +7,6 @@
 # Imports
 ##########################
 import torch
-import os
 import numpy as np
 import SimpleITK as sitk
 import nibabel as nib
@@ -16,10 +15,11 @@ from sklearn.model_selection import KFold
 ##########################
 # Local Imports
 ##########################
-from config import *
-from semseg.data_loader import min_max_normalization, zero_pad_3d_image, z_score_normalization
+from config.config import *
+from config.paths import train_images_folder, train_labels_folder, train_prediction_folder, train_images, train_labels, \
+    test_images_folder, test_images, test_prediction_folder
+from semseg.data_loader import zero_pad_3d_image, z_score_normalization
 from semseg.utils import multi_dice_coeff, plot_confusion_matrix, train_val_split
-from models.vnet3d import VNet3D
 from sklearn.metrics import confusion_matrix, f1_score
 
 ##########################
@@ -52,6 +52,9 @@ use_nib = True
 pad_ref = (48,64,48)
 multi_dices = list()
 f1_scores = list()
+
+os.makedirs(train_prediction_folder, exist_ok=True)
+os.makedirs(test_prediction_folder, exist_ok=True)
 
 train_and_test = [True, False]
 train_and_test_images = [train_images, test_images]
@@ -196,8 +199,8 @@ print("+================================+")
 plot_confusion_matrix(train_confusion_matrix,
                       target_names=None, title='Cross-Validation Confusion matrix',
                       cmap=None, normalize=False, already_normalized=False,
-                      path_out="images/conf_matrix_no_norm_augm_torchio.png")
+                      path_out="images/conf_matrix_no_norm_no_augm_torchio.png")
 plot_confusion_matrix(train_confusion_matrix,
                       target_names=None, title='Cross-Validation Confusion matrix (row-normalized)',
                       cmap=None, normalize=True, already_normalized=False,
-                      path_out="images/conf_matrix_normalized_row_augm_torchio.png")
+                      path_out="images/conf_matrix_normalized_row_no_augm_torchio.png")

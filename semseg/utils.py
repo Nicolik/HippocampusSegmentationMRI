@@ -1,7 +1,7 @@
 import os
 import numpy as np
 
-from config import train_images_folder, train_labels_folder
+from config.paths import train_images_folder, train_labels_folder
 
 
 def dice_coeff(gt, pred, eps=1e-5):

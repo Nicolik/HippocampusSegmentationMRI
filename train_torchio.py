@@ -6,6 +6,7 @@
 ##########################
 # Imports
 ##########################
+import os
 import numpy as np
 import torch
 import torch.optim as optim
@@ -14,7 +15,8 @@ from sklearn.model_selection import KFold
 ##########################
 # Local Imports
 ##########################
-from config import *
+from config.config import SemSegMRIConfig
+from config.paths import logs_folder, train_images_folder, train_labels_folder, train_images, train_labels
 from semseg.utils import train_val_split
 from semseg.train_torchio import train_model, val_model
 from semseg.data_loader_torchio import TorchIODataLoader3DTraining, TorchIODataLoader3DValidation

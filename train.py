@@ -14,7 +14,8 @@ from sklearn.model_selection import KFold
 ##########################
 # Local Imports
 ##########################
-from config import *
+from config.config import *
+from config.paths import logs_folder, train_images_folder, train_labels_folder, train_images, train_labels
 from semseg.utils import train_val_split
 from semseg.train import train_model, val_model
 from semseg.data_loader import GetDataLoader3DTraining, GenDataLoader3DValidation

@@ -1,6 +1,8 @@
 import torch
-from torchio import ImagesDataset, Image
-from config import *
+import torchio
+from torchio import ImagesDataset, Image, ZNormalization, Compose
+from config.config import *
+from config.paths import train_images_folder, train_labels_folder, train_images, train_labels
 from semseg.data_loader_torchio import get_pad_3d_image
 from augm.lambda_channel import LambdaChannel
 

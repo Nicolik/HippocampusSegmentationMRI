@@ -1,10 +1,8 @@
 import SimpleITK as sitk
 import numpy as np
-import torchio
 import torch
-from torchio.transforms import (Compose, RandomElasticDeformation,
-                                RandomAffine)
-from config import *
+from config.config import *
+from config.paths import train_images_folder, train_labels_folder, train_images, train_labels
 
 transforms_dict = {
     RandomAffine(): 0.75,

@@ -13,11 +13,11 @@ from sklearn.model_selection import KFold
 ##########################
 # Local Imports
 ##########################
-from config import *
+from config.config import *
+from config.paths import logs_folder, train_images, train_labels
 from semseg.utils import train_val_split
-from semseg.train_torchio import train_model, val_model
-from semseg.data_loader_torchio import TorchIODataLoader3DTraining, TorchIODataLoader3DValidation
-from models.vnet3d import VNet3D
+from semseg.train_torchio import val_model
+from semseg.data_loader_torchio import TorchIODataLoader3DValidation
 
 ##########################
 # Check training set
