@@ -69,19 +69,19 @@ def run(config):
             ##########################
             # Training (cross-validation)
             ##########################
-            net = VNet3D(num_outs=config.num_outs, channels=config.num_channels)
-            config.lr = 0.01
-            optimizer = optim.Adam(net.parameters(), lr=config.lr)
-            train_data_loader_3D = TorchIODataLoader3DTraining(config)
+            net = VNet3D(num_outs=config_crossval.num_outs, channels=config_crossval.num_channels)
+            config_crossval.lr = 0.01
+            optimizer = optim.Adam(net.parameters(), lr=config_crossval.lr)
+            train_data_loader_3D = TorchIODataLoader3DTraining(config_crossval)
             net = train_model(net, optimizer, train_data_loader_3D,
                               config_crossval, device=cuda_dev, logs_folder=logs_folder)
 
             ##########################
             # Validation (cross-validation)
             ##########################
-            val_data_loader_3D = TorchIODataLoader3DValidation(config)
+            val_data_loader_3D = TorchIODataLoader3DValidation(config_crossval)
             multi_dices, mean_multi_dice, std_multi_dice = val_model(net, val_data_loader_3D,
-                                                                     config, device=cuda_dev)
+                                                                     config_crossval, device=cuda_dev)
             multi_dices_crossval.append(multi_dices)
             mean_multi_dice_crossval.append(mean_multi_dice)
             std_multi_dice_crossval.append(std_multi_dice)

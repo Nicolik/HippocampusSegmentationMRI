@@ -6,14 +6,18 @@ The dataset is publicly available from the
 [Medical Segmentation Decathlon Challenge](http://medicaldecathlon.com/),
 and can be downloaded from 
 [here](https://drive.google.com/drive/folders/1HqEgzS8BV2c7xYNrZdEAnrHk7osJJ--2).
+
 The [PyTorch](https://pytorch.org/) library has been used to write the model architecture 
-and performing the training and validation. [SimpleITK](https://simpleitk.org/) 
-has been exploited to handle I/O of medical images.
+and performing the training and validation. 
+[SimpleITK](https://simpleitk.org/) has been exploited to handle I/O of medical images. 
+3D Data Augmentation has been made by employing [torchio](https://arxiv.org/abs/2003.04696).
+
 A 5-folders cross validation has been performed on the training set, yielding a 
 Mean Multi Dice Coefficient of 0.8719 +/- 0.0387, a Dice Coefficient for 
 Anterior Hippocampus of 0.8821 +/- 0.0367 and a Dice Coefficient for 
 Posterior Hippocampus of 0.8617 +/- 0.0482.
 The results are reported as "mean +/- std". 
+
 Meshes and images reported in the ```images``` folder have been obtained exploiting 
 [ITK-SNAP](http://www.itksnap.org/).
 
@@ -81,19 +85,22 @@ Meshes and images reported in the ```images``` folder have been obtained exploit
 - [x] 3D Data Loader for Nifti files
 - [x] Definition of loss functions
 - [x] Training loop
-- [x] Cross-validation
-- [ ] Data Augmentation
-- [ ] Test
-- [ ] Command Line Interface for training and testing 
+- [x] Cross-validation on Train set
+- [x] Command Line Interface for training 
+- [ ] Command Line Interface for validation 
+- [ ] Data Augmentation 3D 
+- [ ] Validation on Test set
+
 
 ## Training
-If you simply want to perform the training, run the ```train.py``` file.
-If you want to edit the configuration, modify the ```config.py``` file.
-In particular, consider the class ```SemSegMRIConfig```.
+Use ```python setup.py install``` for installing this package.
+If you simply want to perform the training, run ```run/train.py```.
+If you want to edit the configuration, modify the ```config/config.py``` file. In particular, consider the class ```SemSegMRIConfig```. 
+If you want to play with data augmentation (built with ```torchio```), modify the ```config/augm.py``` file.
 
-## Testing
-If you want to perform the inference, either on the training set images, or the
-test set images, see the ```test.py``` file.
+## Validation
+If you want to perform the cross-validation, run ```run/validate.py``` or ```run/validate_torchio.py```. 
+The former adopts a loop from scratch, whereas the latter exploits the DataLoader created upon ```torchio```. 
 
 ### Sample Images (Training set)
 #### Ground Truth Images

@@ -12,7 +12,7 @@ class SemSegMRIConfig(SemSegConfig):
     val_images = None
     val_labels = None
     do_normalize = True
-    batch_size = 4
+    batch_size = 12
     num_workers = 0
     pad_ref = (48, 64, 48)
     lr = 0.01
@@ -23,6 +23,6 @@ class SemSegMRIConfig(SemSegConfig):
     num_outs = 3
     do_crossval = True
     num_folders = 5
-    num_channels = 8
+    num_channels = 4
     transform_train = train_transform
     transform_val = val_transform
