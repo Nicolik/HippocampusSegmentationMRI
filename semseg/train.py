@@ -30,7 +30,7 @@ def train_model(net, optimizer, train_data, config,
 
         for i, data in enumerate(train_data):
 
-            inputs, labels = data
+            inputs, labels = data['t1']['data'], data['label']['data']
             if config.cuda:
                 inputs, labels = inputs.cuda(), labels.cuda()
 
@@ -79,7 +79,7 @@ def val_model(net, val_data, config,
         for i, data in enumerate(val_data):
             print("Iter {} on {}".format(i+1,len(val_data)))
 
-            inputs, labels = data
+            inputs, labels = data['t1']['data'], data['label']['data']
             if config.cuda: inputs, labels = inputs.cuda(), labels.cuda()
 
             # forward pass

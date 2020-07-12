@@ -1,7 +1,7 @@
 from torchio import ZNormalization, Compose
 
 from augm.lambda_channel import LambdaChannel
-from semseg.data_loader_torchio import get_pad_3d_image
+from semseg.data_loader import get_pad_3d_image
 
 train_transforms_dict = {
     ZNormalization(): 1.0,

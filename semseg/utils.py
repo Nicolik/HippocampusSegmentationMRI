@@ -1,7 +1,7 @@
-import os
 import numpy as np
 
-from config.paths import train_images_folder, train_labels_folder
+
+# from config.paths import train_images_folder, train_labels_folder
 
 
 def dice_coeff(gt, pred, eps=1e-5):
@@ -37,20 +37,6 @@ def one_hot_encode_np(label, num_classes):
         for cls in range(num_classes):
             label_ohe[batch_idx, cls] = (batch_el_label == cls)
     return label_ohe
-
-
-def train_val_split(train_images, train_labels, train_index, val_index, do_join=True):
-    train_images_np, train_labels_np = np.array(train_images), np.array(train_labels)
-    train_images_list = list(train_images_np[train_index])
-    val_images_list = list(train_images_np[val_index])
-    train_labels_list = list(train_labels_np[train_index])
-    val_labels_list = list(train_labels_np[val_index])
-    if do_join:
-        train_images_list = [os.path.join(train_images_folder, train_image) for train_image in train_images_list]
-        val_images_list = [os.path.join(train_images_folder, val_image) for val_image in val_images_list]
-        train_labels_list = [os.path.join(train_labels_folder, train_label) for train_label in train_labels_list]
-        val_labels_list = [os.path.join(train_labels_folder, val_label) for val_label in val_labels_list]
-    return train_images_list, val_images_list, train_labels_list, val_labels_list
 
 
 def plot_confusion_matrix(cm,
@@ -132,3 +118,23 @@ def plot_confusion_matrix(cm,
     if path_out is not None:
         plt.savefig(path_out)
     plt.show()
+
+
+def min_max_normalization(input):
+    return (input - input.min()) / (input.max() - input.min())
+
+
+def z_score_normalization(input):
+    input_mean = np.mean(input)
+    input_std = np.std(input)
+    # print("Mean = {:.2f} - Std = {:.2f}".format(input_mean,input_std))
+    return (input - input_mean)/input_std
+
+
+def zero_pad_3d_image(image, pad_ref=(64,64,64), value_to_pad = 0):
+    if value_to_pad == 0:
+        image_padded = np.zeros(pad_ref)
+    else:
+        image_padded = value_to_pad * np.ones(pad_ref)
+    image_padded[:image.shape[0],:image.shape[1],:image.shape[2]] = image
+    return image_padded

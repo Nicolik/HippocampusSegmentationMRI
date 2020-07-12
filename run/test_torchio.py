@@ -6,21 +6,18 @@
 ##########################
 # Imports
 ##########################
-import os
 import numpy as np
 import torch
-import torch.optim as optim
 from sklearn.model_selection import KFold
 
 ##########################
 # Local Imports
 ##########################
-from config.config import SemSegMRIConfig
-from config.paths import logs_folder, train_images_folder, train_labels_folder, train_images, train_labels
-from semseg.utils import train_val_split
-from semseg.train_torchio import train_model, val_model
-from semseg.data_loader_torchio import TorchIODataLoader3DTraining, TorchIODataLoader3DValidation
-from models.vnet3d import VNet3D
+from config.config import *
+from config.paths import logs_folder, train_images, train_labels
+from run.utils import train_val_split
+from semseg.train import val_model
+from semseg.data_loader_torchio import TorchIODataLoader3DValidation
 
 ##########################
 # Check training set
@@ -37,36 +34,24 @@ print("There are: {} Training Labels".format(num_train_labels))
 # Config
 ##########################
 config = SemSegMRIConfig()
+config.batch_size = 1
 attributes_config = [attr for attr in dir(config)
                      if not attr.startswith('__')]
 print("Train Config")
 for item in attributes_config:
     print("{:15s} ==> {}".format(item, getattr(config, item)))
 
-##########################
-# Check Torch Dataset and DataLoader
-##########################
-train_data_loader_3D = TorchIODataLoader3DTraining(config)
-iterable_data_loader = iter(train_data_loader_3D)
-el = next(iterable_data_loader)
-inputs, labels = el['t1']['data'], el['label']['data']
-print("Shape of Batch: [input {}] [label {}]".format(inputs.shape, labels.shape))
+path_net = "logs/model.pt"
+path_nets_crossval = ["logs/model_folder_{:d}.pt".format(idx) for idx in range(config.num_folders)]
 
 ##########################
-# Check Net
-##########################
-# net = VNet3D(num_outs=config.num_outs, channels=config.num_channels)
-# outputs = net(inputs)
-# print("Shape of Output: [output {}]".format(outputs.shape))
-
-##########################
-# Training loop
+# Val loop
 ##########################
 cuda_dev = torch.device('cuda')
 
 if config.do_crossval:
     ##########################
-    # Training (cross-validation)
+    # cross-validation
     ##########################
     num_val_images = num_train_images // config.num_folders
 
@@ -90,12 +75,9 @@ if config.do_crossval:
         ##########################
         # Training (cross-validation)
         ##########################
-        net = VNet3D(num_outs=config.num_outs, channels=config.num_channels)
-        config.lr = 0.01
-        optimizer = optim.Adam(net.parameters(), lr=config.lr)
-        train_data_loader_3D = TorchIODataLoader3DTraining(config)
-        net = train_model(net, optimizer, train_data_loader_3D,
-                          config, device=cuda_dev, logs_folder=logs_folder)
+        model_path = path_nets_crossval[idx]
+        print("Model: {}".format(model_path))
+        net = torch.load(model_path)
 
         ##########################
         # Validation (cross-validation)
@@ -115,20 +97,5 @@ if config.do_crossval:
     mean_multi_dice_crossval_flatten = np.mean(multi_dices_crossval_flatten)
     std_multi_dice_crossval_flatten = np.std(multi_dices_crossval_flatten)
     print("Multi-Dice: {:.4f} +/- {:.4f}".format(mean_multi_dice_crossval_flatten, std_multi_dice_crossval_flatten))
-    # Multi-Dice: 0.8728 +/- 0.0227
+    # Multi-Dice: 0.8668 +/- 0.0337
 
-##########################
-# Training (full training set)
-##########################
-config.train_images = [os.path.join(train_images_folder, train_image)
-                       for train_image in train_images]
-config.train_labels = [os.path.join(train_labels_folder, train_label)
-                       for train_label in train_labels]
-net = VNet3D(num_outs=config.num_outs, channels=config.num_channels)
-config.lr = 0.01
-optimizer = optim.Adam(net.parameters(), lr=config.lr)
-train_data_loader_3D = TorchIODataLoader3DTraining(config)
-net = train_model(net, optimizer, train_data_loader_3D,
-                  config, device=cuda_dev, logs_folder=logs_folder)
-
-torch.save(net,os.path.join(logs_folder,"model.pt"))

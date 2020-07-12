@@ -18,8 +18,8 @@ from sklearn.model_selection import KFold
 from config.config import *
 from config.paths import train_images_folder, train_labels_folder, train_prediction_folder, train_images, train_labels, \
     test_images_folder, test_images, test_prediction_folder
-from semseg.data_loader import zero_pad_3d_image, z_score_normalization
-from semseg.utils import multi_dice_coeff, plot_confusion_matrix, train_val_split
+from semseg.utils import multi_dice_coeff, plot_confusion_matrix, zero_pad_3d_image, z_score_normalization
+from run.utils import train_val_split
 from sklearn.metrics import confusion_matrix, f1_score
 
 ##########################

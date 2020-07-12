@@ -1,6 +1,7 @@
 import torch
-import SimpleITK as sitk
-import numpy as np
+import os
+import torchio
+from torchio import Image, ImagesDataset
 
 
 class SemSegConfig():
@@ -16,113 +17,61 @@ class SemSegConfig():
     num_workers  = 0
 
 
-class Dataset3DFull(torch.utils.data.Dataset):
-    def __init__(self, train_images, train_labels, augmentation=None,
-                 do_normalize=True, zero_pad=True, pad_ref=(64,64,64)):
-        self.train_images = train_images
-        self.train_labels = train_labels
-        self.augmentation = augmentation
-        self.do_normalize = do_normalize
-        self.pad_ref = pad_ref
-        self.zero_pad = zero_pad
-        assert len(train_images) == len(train_labels), \
-            "Mismatch between number of training images and labels"
+def TorchIODataLoader3DTraining(config: SemSegConfig) -> torch.utils.data.DataLoader:
+    print('Building TorchIO Training Set Loader...')
+    subject_list = list()
+    for idx, (image_path, label_path) in enumerate(zip(config.train_images, config.train_labels)):
+        s1 = torchio.Subject(
+            t1=Image(type=torchio.INTENSITY, path=image_path),
+            label=Image(type=torchio.LABEL, path=label_path),
+        )
 
-    def __len__(self):
-        return len(self.train_images)
+        subject_list.append(s1)
 
-    def __getitem__(self, idx):
-
-        image_filename = self.train_images[idx]
-        label_filename = self.train_labels[idx]
-
-        image_sitk = sitk.ReadImage(image_filename)
-        image_np = sitk.GetArrayFromImage(image_sitk)
-
-        label_sitk = sitk.ReadImage(label_filename)
-        label_np = sitk.GetArrayFromImage(label_sitk)
-
-        inputs, labels = image_np, label_np
-        # DEBUG ONLY
-        # print("Shapes: [image {}] [label {}]".format(inputs.shape, labels.shape))
-        # print("Range - Before Normalization - [{:.1f} {:.1f}]".format(inputs.min(),inputs.max()))
-
-        if self.do_normalize:
-            inputs = self.normalize(inputs)
-            # print("Range - After  Normalization - [{:.1f} {:.1f}]".format(inputs.min(), inputs.max()))
-        if self.augmentation is not None:
-            inputs, labels = self.perform_augmentation(inputs, labels)
-            # print("Range - After  Augmentation  - [{:.1f} {:.1f}]".format(inputs.min(), inputs.max()))
-        if self.zero_pad:
-            inputs, labels = self.perform_zero_pad(inputs, labels, value_to_pad=inputs.min())
-            # print("Range - After  Padding       - [{:.1f} {:.1f}]".format(inputs.min(), inputs.max()))
-
-        inputs,labels = np.expand_dims(inputs,axis=0), np.expand_dims(labels,axis=0)
-
-        features, targets = torch.from_numpy(inputs).float(), torch.from_numpy(labels).long()
-        return (features, targets)
-
-    def perform_augmentation(self, inputs, labels):
-        # TODO: implement really 3D Augmentations
-        # Store shapes before augmentation to compare
-        image_shape = inputs.shape
-        mask_shape = labels.shape
-        # Make augmenters deterministic to apply similarly to images and masks
-        det = self.augmentation.to_deterministic()
-        image = det.augment_image(inputs.astype(np.float32))
-        mask = det.augment_image(labels.astype(np.uint8))
-        # Verify that shapes didn't change
-        assert image.shape == image_shape, "Augmentation shouldn't change image size"
-        assert mask.shape == mask_shape, "Augmentation shouldn't change mask size"
-        return (image, mask)
-
-    def normalize(self, inputs):
-        return z_score_normalization(inputs)
-
-    def perform_zero_pad(self, inputs, labels, value_to_pad = 0):
-        return (zero_pad_3d_image(inputs, self.pad_ref, value_to_pad),
-                zero_pad_3d_image(labels, self.pad_ref, 0))
-
-
-def zero_pad_3d_image(image, pad_ref=(64,64,64), value_to_pad = 0):
-    if value_to_pad == 0:
-        image_padded = np.zeros(pad_ref)
-    else:
-        image_padded = value_to_pad * np.ones(pad_ref)
-    image_padded[:image.shape[0],:image.shape[1],:image.shape[2]] = image
-    return image_padded
-
-
-def GetDataLoader3DTraining(config: SemSegConfig) -> torch.utils.data.DataLoader:
-    print('Building Training Set Loader...')
-    train = Dataset3DFull(config.train_images, config.train_labels,
-                          augmentation=config.augmentation, do_normalize=config.do_normalize,
-                          zero_pad=config.zero_pad, pad_ref=config.pad_ref)
-
-    train_data = torch.utils.data.DataLoader(train, batch_size=config.batch_size, shuffle=True,
-                                             num_workers=config.num_workers)
-    print('Training Loader built!')
+    subjects_dataset = ImagesDataset(subject_list, transform=config.transform_train)
+    train_data = torch.utils.data.DataLoader(subjects_dataset, batch_size=config.batch_size,
+                                             shuffle=True, num_workers=config.num_workers)
+    print('TorchIO Training Loader built!')
     return train_data
 
 
-def GenDataLoader3DValidation(config: SemSegConfig) -> torch.utils.data.DataLoader:
-    print('Building Validation Set Loader...')
-    val_dataset = Dataset3DFull(config.val_images, config.val_labels,
-                                augmentation=None, do_normalize=config.do_normalize,
-                                zero_pad=config.zero_pad, pad_ref=config.pad_ref)
+def TorchIODataLoader3DValidation(config: SemSegConfig) -> torch.utils.data.DataLoader:
+    print('Building TorchIO Validation Set Loader...')
+    subject_list = list()
+    for idx, (image_path, label_path) in enumerate(zip(config.val_images, config.val_labels)):
+        s1 = torchio.Subject(
+            t1=Image(type=torchio.INTENSITY, path=image_path),
+            label=Image(type=torchio.LABEL, path=label_path),
+        )
 
-    val_dataloader = torch.utils.data.DataLoader(val_dataset, batch_size=config.batch_size,
-                                                 shuffle=False, num_workers=config.num_workers)
-    print('Validation Loader built!')
-    return val_dataloader
+        subject_list.append(s1)
+
+    subjects_dataset = ImagesDataset(subject_list, transform=config.transform_val)
+    val_data = torch.utils.data.DataLoader(subjects_dataset, batch_size=config.batch_size,
+                                           shuffle=False, num_workers=config.num_workers)
+    print('TorchIO Validation Loader built!')
+    return val_data
 
 
-def min_max_normalization(input):
-    return (input - input.min()) / (input.max() - input.min())
+def get_pad_3d_image(pad_ref: tuple = (64, 64, 64), zero_pad: bool = True):
+    def pad_3d_image(image):
+        if zero_pad:
+            value_to_pad = 0
+        else:
+            value_to_pad = image.min()
+        pad_ref_channels = (image.shape[0], *pad_ref)
+        # print("image.shape = {}".format(image.shape))
+        if value_to_pad == 0:
+            image_padded = torch.zeros(pad_ref_channels)
+        else:
+            image_padded = value_to_pad * torch.ones(pad_ref_channels)
+        image_padded[:,:image.shape[1],:image.shape[2],:image.shape[3]] = image
+        # print("image_padded.shape = {}".format(image_padded.shape))
+        return image_padded
+    return pad_3d_image
 
 
-def z_score_normalization(input):
-    input_mean = np.mean(input)
-    input_std = np.std(input)
-    # print("Mean = {:.2f} - Std = {:.2f}".format(input_mean,input_std))
-    return (input - input_mean)/input_std
+def z_score_normalization(inputs):
+    input_mean = torch.mean(inputs)
+    input_std = torch.std(inputs)
+    return (inputs - input_mean)/input_std
