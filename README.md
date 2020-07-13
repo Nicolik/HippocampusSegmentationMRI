@@ -97,8 +97,6 @@ Meshes and images reported in the ```images``` folder have been obtained exploit
 Use ```python setup.py install``` for installing this package.
 A complete run (dataset download, train, validation) of the package may be the following:
 ```console
-conda create --name hippo
-conda activate hippo
 git clone https://github.com/Nicolik/HippocampusSegmentationMRI.git
 cd HippocampusSegmentationMRI
 python setup.py install
