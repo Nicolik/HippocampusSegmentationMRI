@@ -23,6 +23,6 @@ class SemSegMRIConfig(SemSegConfig):
     num_outs = 3
     do_crossval = True
     num_folders = 5
-    num_channels = 4
+    num_channels = 8
     transform_train = train_transform
     transform_val = val_transform
