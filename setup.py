@@ -3,8 +3,11 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+with open('requirements.txt') as f:
+    required = f.read().splitlines()
+
 setuptools.setup(
-    name="Hippocampus-Segmentation-VNet-Torch", # Replace with your own username
+    name="hippo-vnet",
     version="0.0.1",
     author="Nicola Altini",
     author_email="nicola.altini@poliba.it",
@@ -20,4 +23,5 @@ setuptools.setup(
     ],
     python_requires='>=3.7',
     test_suite='tests',
+    install_reqs=required,
 )
