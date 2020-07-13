@@ -25,7 +25,7 @@ print('{} appended to sys!'.format(current_path_abs))
 
 from run.utils import print_config, check_train_set, check_torch_loader, print_folder, train_val_split_config
 from config.config import SemSegMRIConfig
-from config.paths import logs_folder, train_images_folder, train_labels_folder
+from config.paths import logs_folder
 from semseg.train import train_model, val_model
 from semseg.data_loader import TorchIODataLoader3DTraining, TorchIODataLoader3DValidation
 from models.vnet3d import VNet3D
