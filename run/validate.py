@@ -5,6 +5,7 @@
 # python run/validate.py
 # python run/validate.py --dir=logs/no_augm_torchio
 # python run/validate.py --dir=logs/no_augm_torchio --write=0
+# python run/validate.py --dir=path/to/logs/dir --write=WRITE --verbose=VERBOSE
 
 ##########################
 # Imports
@@ -69,6 +70,9 @@ def run(logs_dir="logs", write_out=False, plot_conf=False):
     train_and_test_images = [train_images, test_images]
     train_and_test_images_folder = [train_images_folder, test_images_folder]
     train_and_test_prediction_folder = [train_prediction_folder, test_prediction_folder]
+    os.makedirs(train_prediction_folder,exist_ok=True)
+    os.makedirs(test_prediction_folder,exist_ok=True)
+
     train_confusion_matrix = np.zeros((config.num_outs, config.num_outs))
 
     for train_or_test_images, train_or_test_images_folder, train_or_test_prediction_folder, is_training in \

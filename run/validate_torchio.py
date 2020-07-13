@@ -4,6 +4,7 @@
 ##########################
 # python run/validate_torchio.py
 # python run/validate_torchio.py --dir=logs/no_augm_torchio
+# python run/validate_torchio.py --dir=path/to/logs/dir --verbose=VERBOSE
 
 ##########################
 # Imports

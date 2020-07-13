@@ -3,6 +3,7 @@
 # V-Net for Hippocampus Segmentation from MRI with PyTorch
 ##########################
 # python run/train.py
+# python run/train.py --epochs=NUM_EPOCHS --batch=BATCH_SIZE --workers=NUM_WORKERS --lr=LR
 
 ##########################
 # Imports
@@ -122,7 +123,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "-b",
-        "--batch_size",
+        "--batch",
         default=config.batch_size, type=int,
         help="Specify the batch size"
     )
@@ -130,11 +131,11 @@ if __name__ == "__main__":
         "-v",
         "--val_epochs",
         default=config.val_epochs, type=int,
-        help="Specify the number of validation epochs during training"
+        help="Specify the number of validation epochs during training ** FOR FUTURE RELEASES **"
     )
     parser.add_argument(
         "-w",
-        "--num_workers",
+        "--workers",
         default=config.num_workers, type=int,
         help="Specify the number of workers"
     )

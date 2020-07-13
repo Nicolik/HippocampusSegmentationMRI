@@ -5,3 +5,4 @@ numpy>=1.19.0
 torch>=1.4.0
 scikit-learn>=0.23.1
 SimpleITK>=1.2.4
+gdown>=3.11.1
