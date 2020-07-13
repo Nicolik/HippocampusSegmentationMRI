@@ -1,7 +1,7 @@
 import SimpleITK as sitk
 from config.config import *
 from config.paths import train_images_folder, train_images
-from semseg.data_loader import min_max_normalization
+from semseg.utils import min_max_normalization
 
 sizes_list = list()
 min_list = list()

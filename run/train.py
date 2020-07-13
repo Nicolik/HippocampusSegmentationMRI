@@ -55,8 +55,6 @@ def run(config):
         ##########################
         # Training (cross-validation)
         ##########################
-        num_val_images = len(config.train_images) // config.num_folders
-
         multi_dices_crossval = list()
         mean_multi_dice_crossval = list()
         std_multi_dice_crossval = list()
@@ -108,14 +106,14 @@ def run(config):
 
     torch.save(net,os.path.join(logs_folder,"model.pt"))
 
+
 ############################
 # MAIN
 ############################
-
 if __name__ == "__main__":
     config = SemSegMRIConfig()
 
-    parser = argparse.ArgumentParser(description="Run Training on Liver Vessels")
+    parser = argparse.ArgumentParser(description="Run Training on Hippocampus Segmentation")
     parser.add_argument(
         "-e",
         "--epochs",

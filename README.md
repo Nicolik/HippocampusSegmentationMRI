@@ -13,9 +13,9 @@ and performing the training and validation.
 3D Data Augmentation has been made by employing [torchio](https://arxiv.org/abs/2003.04696).
 
 A 5-folders cross validation has been performed on the training set, yielding a 
-Mean Multi Dice Coefficient of 0.8719 +/- 0.0387, a Dice Coefficient for 
-Anterior Hippocampus of 0.8821 +/- 0.0367 and a Dice Coefficient for 
-Posterior Hippocampus of 0.8617 +/- 0.0482.
+Mean Multi Dice Coefficient of 0.8727 +/- 0.0364, a Dice Coefficient for 
+Anterior Hippocampus of 0.8821 +/- 0.0363 and a Dice Coefficient for 
+Posterior Hippocampus of 0.8634 +/- 0.0415.
 The results are reported as "mean +/- std". 
 
 Meshes and images reported in the ```images``` folder have been obtained exploiting 
@@ -34,9 +34,9 @@ Meshes and images reported in the ```images``` folder have been obtained exploit
 </tr>
 <tr>
 <td>3D V-Net (no data augmentation)</td>
-<td>0.8719 +/- 0.0387</td>
-<td>0.8821 +/- 0.0367</td>
-<td>0.8617 +/- 0.0482</td>
+<td>0.8727 +/- 0.0364</td>
+<td>0.8821 +/- 0.0363</td>
+<td>0.8634 +/- 0.0415</td>
 </tr>
 <tr>
 <td>3D V-Net (with data augmentation)</td>
@@ -55,10 +55,10 @@ Meshes and images reported in the ```images``` folder have been obtained exploit
 </tr>
 <tr>
 <th>
-<img src="images/conf_matrix_no_norm.png" alt="Confusion Matrix (Cross-validation)" width="400"/>
+<img src="images/conf_matrix_no_norm_no_augm_torchio.png" alt="Confusion Matrix (Cross-validation)" width="400"/>
 </th>
 <th>
-<img src="images/conf_matrix_normalized_row.png" alt="Normalized Confusion Matrix (Cross-validation)" width="400"/>
+<img src="images/conf_matrix_normalized_row_no_augm_torchio.png" alt="Normalized Confusion Matrix (Cross-validation)" width="400"/>
 </th>
 <tr>
 </table>
@@ -87,21 +87,24 @@ Meshes and images reported in the ```images``` folder have been obtained exploit
 - [x] Training loop
 - [x] Cross-validation on Train set
 - [x] Command Line Interface for training 
-- [ ] Command Line Interface for validation 
-- [ ] Data Augmentation 3D 
+- [x] Command Line Interface for validation 
+- [x] 3D Data Augmentation 
+- [ ] Tuning of Optimal Parameters for 3D Data Augmentation
 - [ ] Validation on Test set
 
-
-## Training
+## Usage
 Use ```python setup.py install``` for installing this package.
+
+### Training
 If you simply want to perform the training, run ```run/train.py```.
 If you want to edit the configuration, modify the ```config/config.py``` file. In particular, consider the class ```SemSegMRIConfig```. 
 If you want to play with data augmentation (built with ```torchio```), modify the ```config/augm.py``` file.
 
-## Validation
+### Validation
 If you want to perform the cross-validation, run ```run/validate.py``` or ```run/validate_torchio.py```. 
 The former adopts a loop from scratch, whereas the latter exploits the DataLoader created upon ```torchio```. 
 
+## Output Results
 ### Sample Images (Training set)
 #### Ground Truth Images
 <table>
