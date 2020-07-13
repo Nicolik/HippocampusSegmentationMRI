@@ -23,5 +23,5 @@ setuptools.setup(
     ],
     python_requires='>=3.7',
     test_suite='tests',
-    install_reqs=required,
+    install_requires=required,
 )
