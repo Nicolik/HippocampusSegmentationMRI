@@ -152,9 +152,9 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     config.epochs = args.epochs
-    config.batch_size = args.batch_size
+    config.batch_size = args.batch
     config.val_epochs = args.val_epochs
-    config.num_workers = args.num_workers
+    config.num_workers = args.workers
     config.lr = args.lr
 
     run(config)
