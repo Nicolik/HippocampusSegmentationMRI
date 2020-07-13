@@ -64,6 +64,3 @@ def dice_n_classes(outputs, labels, do_one_hot=False, get_list=False, device=Non
 def get_multi_dice_loss(outputs, labels, device=None):
     labels = labels[:, 0]
     return dice_n_classes(outputs, labels, do_one_hot=True, get_list=False, device=device)
-
-
-LEARNING_RATE_REDUCTION_FACTOR = 10

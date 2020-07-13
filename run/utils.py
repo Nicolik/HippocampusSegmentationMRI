@@ -10,12 +10,17 @@ from semseg.data_loader import TorchIODataLoader3DTraining
 from models.vnet3d import VNet3D
 from semseg.utils import zero_pad_3d_image, z_score_normalization
 
+
 def print_config(config):
     attributes_config = [attr for attr in dir(config)
                          if not attr.startswith('__')]
-    print("Train Config")
+    print("Config")
     for item in attributes_config:
-        print("{:15s} ==> {}".format(item, getattr(config, item)))
+        attr_val = getattr(config,item)
+        if len(str(attr_val)) < 100:
+            print("{:15s} ==> {}".format(item, attr_val))
+        else:
+            print("{:15s} ==> String too long [{} characters]".format(item,len(str(attr_val))))
 
 
 def check_train_set(config):
@@ -162,3 +167,84 @@ def print_metrics(multi_dices, f1_scores, train_confusion_matrix):
                                             train_confusion_matrix.sum(axis=1)[:, np.newaxis]
     print(train_confusion_matrix_normalized_row)
     print("+================================+")
+
+
+def plot_confusion_matrix(cm,
+                          target_names=None,
+                          title='Confusion matrix',
+                          cmap=None,
+                          normalize=True,
+                          already_normalized=False,
+                          path_out=None):
+    """
+    given a sklearn confusion matrix (cm), make a nice plot
+
+    Arguments
+    ---------
+    cm:           confusion matrix from sklearn.metrics.confusion_matrix
+
+    target_names: given classification classes such as [0, 1, 2]
+                  the class names, for example: ['high', 'medium', 'low']
+
+    title:        the text to display at the top of the matrix
+
+    cmap:         the gradient of the values displayed from matplotlib.pyplot.cm
+                  see http://matplotlib.org/examples/color/colormaps_reference.html
+                  plt.get_cmap('jet') or plt.cm.Blues
+
+    normalize:    If False, plot the raw numbers
+                  If True, plot the proportions
+
+    Usage
+    -----
+    plot_confusion_matrix(cm           = cm,                  # confusion matrix created by
+                                                              # sklearn.metrics.confusion_matrix
+                          normalize    = True,                # show proportions
+                          target_names = y_labels_vals,       # list of names of the classes
+                          title        = best_estimator_name) # title of graph
+
+    Citiation
+    ---------
+    http://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
+
+    """
+    import matplotlib.pyplot as plt
+    import numpy as np
+    import itertools
+
+    accuracy = np.trace(cm) / np.sum(cm).astype('float')
+    misclass = 1 - accuracy
+
+    if cmap is None:
+        cmap = plt.get_cmap('Blues')
+
+    if normalize:
+        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+
+    plt.figure(figsize=(8, 8))
+    plt.matshow(cm, cmap=cmap)
+    plt.title(title, pad=25.)
+    plt.colorbar()
+
+    if target_names is not None:
+        tick_marks = np.arange(len(target_names))
+        plt.xticks(tick_marks, target_names, rotation=45)
+        plt.yticks(tick_marks, target_names)
+
+    thresh = cm.max() / 1.5 if normalize or already_normalized else cm.max() / 2
+    print("Thresh = {}".format(thresh))
+    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+        if normalize or already_normalized:
+            plt.text(j, i, "{:0.4f}".format(cm[i, j]),
+                     horizontalalignment="center",
+                     color="white" if cm[i, j] > thresh else "black")
+        else:
+            plt.text(j, i, "{:,}".format(cm[i, j]),
+                     horizontalalignment="center",
+                     color="white" if cm[i, j] > thresh else "black")
+
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label\naccuracy={:0.4f}; misclass={:0.4f}'.format(accuracy, misclass))
+    if path_out is not None:
+        plt.savefig(path_out)
+    plt.show()

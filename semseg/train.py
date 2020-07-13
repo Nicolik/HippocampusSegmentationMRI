@@ -4,12 +4,12 @@ import time
 import numpy as np
 import torch
 
-from semseg.loss import LEARNING_RATE_REDUCTION_FACTOR, get_multi_dice_loss
+from semseg.loss import get_multi_dice_loss
+from config.config import LEARNING_RATE_REDUCTION_FACTOR
 from semseg.utils import multi_dice_coeff
 
 
-def train_model(net, optimizer, train_data, config,
-                device=None, logs_folder=None):
+def train_model(net, optimizer, train_data, config, device=None, logs_folder=None):
 
     print('Start training...')
     net = net.to(device)
@@ -68,10 +68,10 @@ def train_model(net, optimizer, train_data, config,
     return net
 
 
-def val_model(net, val_data, config,
-              device=None):
+def val_model(net, val_data, config, device=None):
 
     print("Start Validation...")
+    net = net.to(device)
     # val loop
     multi_dices = list()
     with torch.no_grad():

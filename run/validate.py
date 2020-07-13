@@ -28,9 +28,9 @@ from config.paths import ( train_images_folder, train_labels_folder, train_predi
                            train_images, train_labels,
                            test_images_folder, test_images, test_prediction_folder)
 from run.utils import (train_val_split, print_folder, nii_load, sitk_load, nii_write, print_config,
-                       sitk_write, print_test, np3d_to_torch5d, torch5d_to_np3d, print_metrics)
+                       sitk_write, print_test, np3d_to_torch5d, torch5d_to_np3d, print_metrics, plot_confusion_matrix)
 from config.config import SemSegMRIConfig
-from semseg.utils import multi_dice_coeff, plot_confusion_matrix
+from semseg.utils import multi_dice_coeff
 from sklearn.metrics import confusion_matrix, f1_score
 
 
