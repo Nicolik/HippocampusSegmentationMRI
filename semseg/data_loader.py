@@ -1,7 +1,7 @@
 import torch
 import os
 import torchio
-from torchio import Image, ImagesDataset
+from torchio import Image, ImagesDataset, SubjectsDataset
 
 
 class SemSegConfig():
@@ -28,7 +28,9 @@ def TorchIODataLoader3DTraining(config: SemSegConfig) -> torch.utils.data.DataLo
 
         subject_list.append(s1)
 
-    subjects_dataset = ImagesDataset(subject_list, transform=config.transform_train)
+    # Deprecated
+    # subjects_dataset = ImagesDataset(subject_list, transform=config.transform_train)
+    subjects_dataset = SubjectsDataset(subject_list, transform=config.transform_train)
     train_data = torch.utils.data.DataLoader(subjects_dataset, batch_size=config.batch_size,
                                              shuffle=True, num_workers=config.num_workers)
     print('TorchIO Training Loader built!')
@@ -46,7 +48,9 @@ def TorchIODataLoader3DValidation(config: SemSegConfig) -> torch.utils.data.Data
 
         subject_list.append(s1)
 
-    subjects_dataset = ImagesDataset(subject_list, transform=config.transform_val)
+    # Deprecated
+    # subjects_dataset = ImagesDataset(subject_list, transform=config.transform_val)
+    subjects_dataset = SubjectsDataset(subject_list, transform=config.transform_val)
     val_data = torch.utils.data.DataLoader(subjects_dataset, batch_size=config.batch_size,
                                            shuffle=False, num_workers=config.num_workers)
     print('TorchIO Validation Loader built!')
