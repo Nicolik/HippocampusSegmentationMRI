@@ -26,6 +26,7 @@ class SemSegMRIConfig(SemSegConfig):
     num_channels = 8
     transform_train = train_transform
     transform_val = val_transform
+    net = "vnet"
 
 
 LEARNING_RATE_REDUCTION_FACTOR = 2

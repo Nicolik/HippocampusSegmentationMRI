@@ -4,6 +4,7 @@
 ##########################
 # python run/train.py
 # python run/train.py --epochs=NUM_EPOCHS --batch=BATCH_SIZE --workers=NUM_WORKERS --lr=LR
+# python run/train.py --epochs=5 --batch=1 --net=unet
 
 ##########################
 # Imports
@@ -29,6 +30,16 @@ from config.paths import logs_folder
 from semseg.train import train_model, val_model
 from semseg.data_loader import TorchIODataLoader3DTraining, TorchIODataLoader3DValidation
 from models.vnet3d import VNet3D
+from models.unet3d import UNet
+
+
+def get_net(config):
+    name = config.net
+    assert name in ['unet', 'vnet'], "Network Name not valid or not supported! Use one of ['unet', 'vnet']"
+    if name == 'vnet':
+        return VNet3D(num_outs=config.num_outs, channels=config.num_channels)
+    elif name == 'unet':
+        return UNet(num_channels=1, num_outs=config.num_outs)
 
 
 def run(config):
@@ -68,7 +79,7 @@ def run(config):
             ##########################
             # Training (cross-validation)
             ##########################
-            net = VNet3D(num_outs=config_crossval.num_outs, channels=config_crossval.num_channels)
+            net = get_net(config_crossval)
             config_crossval.lr = 0.01
             optimizer = optim.Adam(net.parameters(), lr=config_crossval.lr)
             train_data_loader_3D = TorchIODataLoader3DTraining(config_crossval)
@@ -98,7 +109,7 @@ def run(config):
     ##########################
     # Training (full training set)
     ##########################
-    net = VNet3D(num_outs=config.num_outs, channels=config.num_channels)
+    net = get_net(config)
     config.lr = 0.01
     optimizer = optim.Adam(net.parameters(), lr=config.lr)
     train_data_loader_3D = TorchIODataLoader3DTraining(config)
@@ -151,6 +162,7 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
+    config.net = args.net
     config.epochs = args.epochs
     config.batch_size = args.batch
     config.val_epochs = args.val_epochs
