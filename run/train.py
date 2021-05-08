@@ -30,7 +30,7 @@ from config.paths import logs_folder
 from semseg.train import train_model, val_model
 from semseg.data_loader import TorchIODataLoader3DTraining, TorchIODataLoader3DValidation
 from models.vnet3d import VNet3D
-from models.unet3d import UNet
+from models.unet3d import UNet3D
 
 
 def get_net(config):
@@ -39,7 +39,7 @@ def get_net(config):
     if name == 'vnet':
         return VNet3D(num_outs=config.num_outs, channels=config.num_channels)
     elif name == 'unet':
-        return UNet(num_channels=1, num_outs=config.num_outs)
+        return UNet3D(num_out_classes=config.num_outs, input_channels=1, init_feat_channels=32)
 
 
 def run(config):
